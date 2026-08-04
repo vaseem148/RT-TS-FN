@@ -1,0 +1,168 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
+import { ArrowRight, Building2, Lock, Mail, Phone, User } from 'lucide-react';
+import { toApiError } from '@/lib/api';
+import { useAuth } from '@/components/providers/auth-provider';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/field';
+
+export default function RegisterPage() {
+  const router = useRouter();
+  const { register } = useAuth();
+
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    company: '',
+    password: '',
+    confirmPassword: '',
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
+
+  const update =
+    (key: keyof typeof form) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      setForm((prev) => ({ ...prev, [key]: event.target.value }));
+      setErrors((prev) => ({ ...prev, [key]: '' }));
+    };
+
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (form.password !== form.confirmPassword) {
+      setErrors({ confirmPassword: 'Passwords do not match' });
+      return;
+    }
+
+    setLoading(true);
+    setErrors({});
+    try {
+      const user = await register({
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        password: form.password,
+        company: form.company,
+      });
+      toast.success(`Welcome to Renderways, ${user.name.split(' ')[0]}!`);
+      router.push('/portal');
+    } catch (error) {
+      const apiError = toApiError(error);
+      setErrors(apiError.details || {});
+      toast.error(apiError.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <h1 className="text-3xl font-extrabold tracking-tight text-fg">Create your account</h1>
+      <p className="mt-2 text-[14.5px] text-fg-muted">
+        Free to join. Raise unlimited service tickets and track every repair in one place.
+      </p>
+
+      <form onSubmit={submit} className="mt-8 flex flex-col gap-4">
+        <Input
+          label="Full name"
+          required
+          autoComplete="name"
+          placeholder="Ramesh Kumar"
+          icon={<User className="size-4" />}
+          value={form.name}
+          onChange={update('name')}
+          error={errors.name}
+        />
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Input
+            label="Email address"
+            type="email"
+            required
+            autoComplete="email"
+            placeholder="you@example.com"
+            icon={<Mail className="size-4" />}
+            value={form.email}
+            onChange={update('email')}
+            error={errors.email}
+          />
+          <Input
+            label="Phone number"
+            type="tel"
+            required
+            autoComplete="tel"
+            placeholder="98765 43210"
+            icon={<Phone className="size-4" />}
+            value={form.phone}
+            onChange={update('phone')}
+            error={errors.phone}
+            hint="Used for WhatsApp updates"
+          />
+        </div>
+
+        <Input
+          label="Company"
+          placeholder="Optional — for business accounts"
+          icon={<Building2 className="size-4" />}
+          value={form.company}
+          onChange={update('company')}
+          error={errors.company}
+        />
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Input
+            label="Password"
+            type="password"
+            required
+            autoComplete="new-password"
+            placeholder="At least 6 characters"
+            icon={<Lock className="size-4" />}
+            value={form.password}
+            onChange={update('password')}
+            error={errors.password}
+          />
+          <Input
+            label="Confirm password"
+            type="password"
+            required
+            autoComplete="new-password"
+            placeholder="Repeat password"
+            icon={<Lock className="size-4" />}
+            value={form.confirmPassword}
+            onChange={update('confirmPassword')}
+            error={errors.confirmPassword}
+          />
+        </div>
+
+        <Button type="submit" size="lg" loading={loading} className="mt-2 w-full">
+          Create account
+          <ArrowRight className="size-4" />
+        </Button>
+
+        <p className="text-center text-[12px] leading-relaxed text-fg-subtle">
+          By creating an account you agree to our{' '}
+          <Link href="/terms" className="text-fg-muted underline hover:text-brand">
+            Terms of Service
+          </Link>{' '}
+          and{' '}
+          <Link href="/privacy" className="text-fg-muted underline hover:text-brand">
+            Privacy Policy
+          </Link>
+          .
+        </p>
+      </form>
+
+      <p className="mt-6 text-center text-[14px] text-fg-muted">
+        Already have an account?{' '}
+        <Link href="/login" className="font-bold text-brand hover:underline">
+          Sign in
+        </Link>
+      </p>
+    </>
+  );
+}

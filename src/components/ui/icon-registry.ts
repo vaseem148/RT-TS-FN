@@ -1,0 +1,89 @@
+/**
+ * Icons that are looked up by *name* at runtime (service icons from the
+ * database, category maps, nav config, stat tiles, empty states).
+ *
+ * These are listed explicitly rather than reached through
+ * `import * as Icons from 'lucide-react'` — a namespace import indexed by a
+ * dynamic key cannot be tree-shaken, so that pattern ships the entire icon
+ * library (~1000 components) to the browser on every page.
+ *
+ * Adding a new dynamic icon name means adding it here too.
+ */
+import {
+  Activity,
+  Cctv,
+  CircleCheck,
+  CircleCheckBig,
+  CirclePlus,
+  CircuitBoard,
+  Cpu,
+  DatabaseBackup,
+  ExternalLink,
+  HardDrive,
+  IndianRupee,
+  Inbox,
+  Laptop,
+  LayoutDashboard,
+  Monitor,
+  Mouse,
+  Network,
+  PackageMinus,
+  PackageOpen,
+  PackageSearch,
+  SearchX,
+  ServerCrash,
+  ShieldCheck,
+  Star,
+  Ticket,
+  TicketPlus,
+  TicketX,
+  Timer,
+  TriangleAlert,
+  UserPlus,
+  UserRound,
+  UserSearch,
+  Users,
+  Video,
+  Wrench,
+  type LucideIcon,
+} from 'lucide-react';
+
+export const ICONS: Record<string, LucideIcon> = {
+  Activity,
+  Cctv,
+  CircleCheck,
+  CircleCheckBig,
+  CirclePlus,
+  CircuitBoard,
+  Cpu,
+  DatabaseBackup,
+  ExternalLink,
+  HardDrive,
+  IndianRupee,
+  Inbox,
+  Laptop,
+  LayoutDashboard,
+  Monitor,
+  Mouse,
+  Network,
+  PackageMinus,
+  PackageOpen,
+  PackageSearch,
+  SearchX,
+  ServerCrash,
+  ShieldCheck,
+  Star,
+  Ticket,
+  TicketPlus,
+  TicketX,
+  Timer,
+  TriangleAlert,
+  UserPlus,
+  UserRound,
+  UserSearch,
+  Users,
+  Video,
+  Wrench,
+};
+
+export const FALLBACK_ICON = Wrench;

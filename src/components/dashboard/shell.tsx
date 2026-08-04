@@ -1,0 +1,161 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ExternalLink, LogOut, Menu, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useAuth } from '@/components/providers/auth-provider';
+import { Logo } from '@/components/layout/logo';
+import { ThemeToggle } from '@/components/layout/theme-toggle';
+import { Avatar, Icon } from '@/components/ui/misc';
+
+export interface NavItem {
+  label: string;
+  href: string;
+  icon: string;
+  badge?: number;
+  /** Match only on exact path — used for dashboard index links. */
+  exact?: boolean;
+}
+
+export function DashboardShell({
+  nav,
+  title,
+  children,
+}: {
+  nav: NavItem[];
+  title: string;
+  children: React.ReactNode;
+}) {
+  const pathname = usePathname();
+  const { user, logout } = useAuth();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => setOpen(false), [pathname]);
+
+  const isActive = (item: NavItem) =>
+    item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+  const navList = (
+    <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
+      {nav.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          className={cn(
+            'group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold transition-all',
+            isActive(item)
+              ? 'bg-brand-soft text-brand shadow-sm'
+              : 'text-fg-muted hover:bg-surface-2 hover:text-fg'
+          )}
+        >
+          <Icon
+            name={item.icon}
+            className={cn(
+              'size-[18px] shrink-0 transition-transform group-hover:scale-110',
+              isActive(item) ? 'text-brand' : 'text-fg-subtle'
+            )}
+          />
+          <span className="flex-1 truncate">{item.label}</span>
+          {item.badge !== undefined && item.badge > 0 && (
+            <span className="rounded-full bg-danger px-1.5 py-0.5 text-[10px] font-bold text-white">
+              {item.badge > 99 ? '99+' : item.badge}
+            </span>
+          )}
+        </Link>
+      ))}
+    </nav>
+  );
+
+  const footer = (
+    <div className="border-t border-line p-3">
+      <div className="flex items-center gap-2.5 rounded-xl bg-surface-2 p-2.5">
+        <Avatar name={user?.name} src={user?.avatar} size="sm" />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[13px] font-bold text-fg">{user?.name}</p>
+          <p className="truncate text-[11px] text-fg-subtle capitalize">{user?.role}</p>
+        </div>
+        <button
+          onClick={() => void logout()}
+          className="rounded-lg p-1.5 text-fg-subtle transition-colors hover:bg-danger-soft hover:text-danger"
+          aria-label="Sign out"
+          title="Sign out"
+        >
+          <LogOut className="size-4" />
+        </button>
+      </div>
+      <Link
+        href="/"
+        className="mt-2 flex items-center gap-2 rounded-lg px-3 py-2 text-[12.5px] font-medium text-fg-subtle transition-colors hover:text-brand"
+      >
+        <ExternalLink className="size-3.5" />
+        View public website
+      </Link>
+    </div>
+  );
+
+  return (
+    <div className="flex min-h-dvh bg-bg-subtle">
+      {/* Desktop sidebar */}
+      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-line bg-surface lg:flex">
+        <div className="border-b border-line p-4">
+          <Logo />
+        </div>
+        {navList}
+        {footer}
+      </aside>
+
+      {/* Mobile drawer */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-100 lg:hidden"
+          >
+            <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
+            <motion.aside
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="absolute inset-y-0 left-0 flex w-72 flex-col border-r border-line bg-surface"
+            >
+              <div className="flex items-center justify-between border-b border-line p-4">
+                <Logo />
+                <button
+                  onClick={() => setOpen(false)}
+                  className="grid size-9 place-items-center rounded-lg border border-line text-fg-muted"
+                  aria-label="Close menu"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+              {navList}
+              {footer}
+            </motion.aside>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="glass sticky top-0 z-40 flex h-15 items-center gap-3 border-b border-line px-4 sm:px-6">
+          <button
+            onClick={() => setOpen(true)}
+            className="grid size-9 place-items-center rounded-lg border border-line bg-surface text-fg lg:hidden"
+            aria-label="Open menu"
+          >
+            <Menu className="size-5" />
+          </button>
+          <h1 className="flex-1 truncate text-[15px] font-bold text-fg">{title}</h1>
+          <ThemeToggle />
+        </header>
+
+        <main className="flex-1 p-4 sm:p-6">{children}</main>
+      </div>
+    </div>
+  );
+}

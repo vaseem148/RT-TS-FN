@@ -1,0 +1,408 @@
+@import 'tailwindcss';
+
+/* next-themes writes `class="dark"` onto <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ------------------------------------------------------------------ *
+ * Semantic tokens — one set per theme, consumed through @theme inline
+ * ------------------------------------------------------------------ */
+
+:root {
+  --bg: #ffffff;
+  --bg-subtle: #f6f8fb;
+  --surface: #ffffff;
+  --surface-2: #f1f5f9;
+  --surface-glass: 255 255 255 / 0.72;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+
+  --fg: #0b1220;
+  --fg-muted: #56637a;
+  --fg-subtle: #8794aa;
+
+  --brand: #0284c7;
+  --brand-strong: #0369a1;
+  --brand-soft: #e0f2fe;
+  --brand-fg: #ffffff;
+
+  --accent: #7c3aed;
+  --accent-soft: #ede9fe;
+
+  --success: #059669;
+  --success-soft: #d1fae5;
+  --warning: #d97706;
+  --warning-soft: #fef3c7;
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+  --info: #0891b2;
+  --info-soft: #cffafe;
+
+  --ring: #0ea5e9;
+  --shadow-color: 215 40% 40%;
+
+  --glow-1: rgba(14, 165, 233, 0.18);
+  --glow-2: rgba(124, 58, 237, 0.14);
+  --grid-line: rgba(2, 6, 23, 0.055);
+}
+
+.dark {
+  --bg: #05070e;
+  --bg-subtle: #080c16;
+  --surface: #0c1220;
+  --surface-2: #131b2c;
+  --surface-glass: 12 18 32 / 0.62;
+  --border: #1e293b;
+  --border-strong: #33415a;
+
+  --fg: #eef3fb;
+  --fg-muted: #98a6bf;
+  --fg-subtle: #64748b;
+
+  --brand: #22d3ee;
+  --brand-strong: #67e8f9;
+  --brand-soft: #06283a;
+  --brand-fg: #04121a;
+
+  --accent: #a78bfa;
+  --accent-soft: #1e1b4b;
+
+  --success: #34d399;
+  --success-soft: #052e26;
+  --warning: #fbbf24;
+  --warning-soft: #3a2a06;
+  --danger: #f87171;
+  --danger-soft: #3f1414;
+  --info: #38bdf8;
+  --info-soft: #0a2a3d;
+
+  --ring: #22d3ee;
+  --shadow-color: 210 60% 2%;
+
+  --glow-1: rgba(34, 211, 238, 0.16);
+  --glow-2: rgba(167, 139, 250, 0.13);
+  --grid-line: rgba(148, 163, 184, 0.07);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-fg: var(--brand-fg);
+
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+
+  --color-ring: var(--ring);
+
+  --font-sans:
+    'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --radius-xl: 1rem;
+  --radius-2xl: 1.375rem;
+  --radius-3xl: 1.75rem;
+
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-pulse-ring: pulse-ring 2.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-shimmer: shimmer 2.2s linear infinite;
+  --animate-aurora: aurora 22s ease-in-out infinite alternate;
+}
+
+/* ------------------------------------------------------------------ *
+ * Base
+ * ------------------------------------------------------------------ */
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--brand);
+    color: var(--brand-fg);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg-subtle);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 99px;
+    border: 2px solid var(--bg-subtle);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--fg-subtle);
+  }
+
+  input,
+  textarea,
+  select {
+    color-scheme: light;
+  }
+  .dark input,
+  .dark textarea,
+  .dark select {
+    color-scheme: dark;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Component utilities
+ * ------------------------------------------------------------------ */
+
+@utility glass {
+  background: rgb(var(--surface-glass));
+  /* Blur radius is deliberately modest — backdrop-filter re-rasterises on
+     every scroll frame, and the cost climbs sharply with the radius. */
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  /* Promote to its own compositor layer so scrolling doesn't repaint it. */
+  transform: translateZ(0);
+}
+
+@utility text-gradient {
+  background-image: linear-gradient(
+    100deg,
+    var(--brand) 0%,
+    var(--accent) 55%,
+    var(--brand-strong) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+@utility glow-brand {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--brand) 30%, transparent),
+    0 8px 30px -6px color-mix(in oklab, var(--brand) 45%, transparent);
+}
+
+@utility card-hover {
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease;
+}
+
+@layer components {
+  .surface-card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-2xl);
+  }
+
+  .grid-bg {
+    background-image:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 90% 65% at 50% 0%, #000 45%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 65% at 50% 0%, #000 45%, transparent 100%);
+  }
+
+  .aurora {
+    position: absolute;
+    inset: -30%;
+    pointer-events: none;
+    background:
+      radial-gradient(40% 40% at 20% 25%, var(--glow-1) 0%, transparent 65%),
+      radial-gradient(35% 45% at 78% 18%, var(--glow-2) 0%, transparent 62%),
+      radial-gradient(45% 35% at 55% 85%, var(--glow-1) 0%, transparent 68%);
+    /* The gradients are already soft, so a light blur is enough — a large
+       blur radius here forces an expensive re-raster of a huge layer. */
+    filter: blur(16px);
+    animation: var(--animate-aurora);
+    /* Cache the blurred result as a compositor layer; the animation only
+       moves that layer instead of repainting it each frame. */
+    will-change: transform;
+    contain: strict;
+    backface-visibility: hidden;
+  }
+
+  /* Animated gradient outline used on hero CTAs and featured cards. */
+  .border-beam {
+    position: relative;
+    isolation: isolate;
+  }
+  .border-beam::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    /* An animated conic-gradient repaints every frame; confining paint to
+       this element stops it invalidating the rest of the page. */
+    contain: paint;
+    will-change: background;
+    background: conic-gradient(
+      from var(--beam-angle, 0deg),
+      transparent 0deg,
+      var(--brand) 70deg,
+      var(--accent) 130deg,
+      transparent 200deg
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: beam-spin 5s linear infinite;
+    z-index: -1;
+  }
+
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--surface-2) 25%,
+      color-mix(in oklab, var(--surface-2) 60%, var(--border-strong)) 50%,
+      var(--surface-2) 75%
+    );
+    background-size: 200% 100%;
+    animation: var(--animate-shimmer);
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Keyframes
+ * ------------------------------------------------------------------ */
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(1.5deg);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--brand) 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 14px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes aurora {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2%, -3%, 0) scale(1.08);
+  }
+  100% {
+    transform: translate3d(-2%, 2%, 0) scale(1.03);
+  }
+}
+
+@property --beam-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes beam-spin {
+  to {
+    --beam-angle: 360deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
