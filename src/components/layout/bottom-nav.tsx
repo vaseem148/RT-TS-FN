@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { useIsApp } from '@/lib/app-mode';
 import { Icon } from '@/components/ui/misc';
 
 export interface BottomNavItem {
@@ -35,7 +34,6 @@ export function BottomNav({
   className?: string;
 }) {
   const pathname = usePathname();
-  const isApp = useIsApp();
 
   // The most specific match wins, so /portal/tickets/new lights up "Raise"
   // rather than "Tickets".
@@ -54,25 +52,39 @@ export function BottomNav({
         href={item.href}
         aria-current={isActive ? 'page' : undefined}
         className={cn(
-          'relative isolate flex h-full flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl text-[10.5px] font-semibold transition-colors active:scale-95',
+          'relative isolate flex h-full flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl text-[10.5px] font-semibold transition-colors active:scale-95 app:gap-1 app:text-[11px]',
           isActive ? 'text-brand' : 'text-fg-subtle',
           extraClass
         )}
       >
-        {/* The primary tab is hidden on the website; it must not own the shared
-            highlight there, or the highlight would fly in from nowhere. */}
-        {isActive && (!item.primary || isApp) && (
+        {/* Website: the highlight fills the tab. App: a pill behind the icon.
+            Each lives only where it is shown, so neither flies in from nowhere. */}
+        {isActive && (
           <motion.span
             layoutId={`bottom-nav-${id}`}
-            className="absolute inset-x-1.5 inset-y-1.5 -z-10 rounded-2xl bg-brand-soft app:inset-x-5 app:top-0 app:bottom-auto app:h-[3px] app:rounded-full app:bg-brand"
+            className="absolute inset-x-1.5 inset-y-1.5 -z-10 rounded-2xl bg-brand-soft app:hidden"
             transition={{ type: 'spring', damping: 26, stiffness: 320 }}
           />
         )}
-        <Icon
-          name={item.icon}
-          className={cn('size-[21px] transition-transform duration-300', isActive && '-translate-y-0.5 scale-110')}
-        />
-        <span className="leading-none">{item.shortLabel ?? item.label}</span>
+        <span className="relative grid place-items-center app:h-8 app:w-14">
+          {isActive && (
+            <motion.span
+              layoutId={`bottom-nav-app-${id}`}
+              className="absolute inset-0 -z-10 hidden rounded-full bg-brand-soft app:block"
+              transition={{ type: 'spring', damping: 26, stiffness: 320 }}
+            />
+          )}
+          <Icon
+            name={item.icon}
+            className={cn(
+              'size-[21px] transition-transform duration-300',
+              isActive && '-translate-y-0.5 scale-110 app:translate-y-0 app:scale-100'
+            )}
+          />
+        </span>
+        <span className={cn('leading-none', isActive && 'app:font-bold')}>
+          {item.shortLabel ?? item.label}
+        </span>
       </Link>
     );
   };
@@ -82,26 +94,43 @@ export function BottomNav({
       aria-label="Primary"
       className={cn(
         'fixed inset-x-0 bottom-0 z-50 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden',
-        'app:border-t app:border-line app:bg-surface app:px-0 app:pb-(--safe-bottom)',
+        'app:rounded-t-[26px] app:border-t app:border-line/70 app:bg-surface app:px-0 app:pb-(--safe-bottom) app:shadow-[0_-10px_30px_-16px_rgb(27_24_56/0.3)]',
         className
       )}
     >
-      <div className="mx-auto flex h-16 max-w-md items-center rounded-3xl border border-line bg-surface/95 px-1.5 shadow-2xl shadow-black/30 backdrop-blur-xl app:max-w-lg app:rounded-none app:border-0 app:bg-transparent app:shadow-none app:backdrop-blur-none">
+      <div className="mx-auto flex h-16 max-w-md items-center rounded-3xl border border-line bg-surface/95 px-1.5 shadow-2xl shadow-black/30 backdrop-blur-xl app:h-[68px] app:max-w-lg app:rounded-none app:border-0 app:bg-transparent app:px-2 app:shadow-none app:backdrop-blur-none">
         {items.map((item) => {
           if (!item.primary) return tab(item);
 
+          const isActive = active?.href === item.href;
           return [
             <div key={`raised-${item.href}`} className="flex flex-1 justify-center app:hidden">
               <Link
                 href={item.href}
                 aria-label={item.label}
-                aria-current={active?.href === item.href ? 'page' : undefined}
+                aria-current={isActive ? 'page' : undefined}
                 className="-mt-9 grid size-15 place-items-center rounded-full bg-linear-135 from-brand to-accent text-white shadow-lg shadow-brand/40 ring-4 ring-bg transition-transform duration-200 active:scale-90"
               >
                 <Icon name={item.icon} className="size-7" />
               </Link>
             </div>,
-            tab(item, 'hidden app:flex'),
+            // App: the action rises out of the bar, notched by a ring in the bar's colour.
+            <Link
+              key={`app-${item.href}`}
+              href={item.href}
+              aria-current={isActive ? 'page' : undefined}
+              className={cn(
+                'hidden h-full flex-1 flex-col items-center justify-end gap-1 pb-[10px] text-[11px] font-semibold app:flex',
+                isActive ? 'text-brand' : 'text-fg-subtle'
+              )}
+            >
+              <span className="grid size-14 shrink-0 place-items-center rounded-full bg-linear-135 from-brand to-accent text-white shadow-lg shadow-brand/40 ring-[5px] ring-surface transition-transform duration-200 active:scale-90">
+                <Icon name={item.icon} className="size-6" />
+              </span>
+              <span className={cn('leading-none', isActive && 'font-bold')}>
+                {item.shortLabel ?? item.label}
+              </span>
+            </Link>,
           ];
         })}
       </div>

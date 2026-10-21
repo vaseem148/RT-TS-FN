@@ -3,39 +3,18 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {
-  ArrowRight,
-  ChevronRight,
-  FileText,
-  Info,
-  Mail,
-  MapPin,
-  MessageCircle,
-  Package,
-  Phone,
-  Search,
-  ShieldCheck,
-  X,
-} from 'lucide-react';
+import { ArrowRight, ChevronRight, MapPin, MessageCircle, Phone, Search, X } from 'lucide-react';
 import { site, whatsappLink } from '@/lib/site';
 import { serviceApi, ticketApi } from '@/lib/endpoints';
 import { useApi } from '@/lib/use-api';
 import { useIsApp } from '@/lib/app-mode';
 import { formatCurrency } from '@/lib/utils';
 import { homeFor, useAuth } from '@/components/providers/auth-provider';
+import { APP_MORE_LINKS } from '@/components/layout/app-links';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { TicketCard } from '@/components/tickets/ticket-list';
 import { Button } from '@/components/ui/button';
 import { Icon, Skeleton, Spinner } from '@/components/ui/misc';
-
-const MORE = [
-  { label: 'Track a ticket', href: '/track', icon: Search },
-  { label: 'Products', href: '/products', icon: Package },
-  { label: 'About us', href: '/about', icon: Info },
-  { label: 'Contact', href: '/contact', icon: Mail },
-  { label: 'Privacy policy', href: '/privacy', icon: ShieldCheck },
-  { label: 'Terms of service', href: '/terms', icon: FileText },
-];
 
 const TICKET_NUMBER = /^RW-?\d/i;
 
@@ -330,7 +309,7 @@ export function AppHome() {
         <section>
           <h2 className="mb-3 text-[16px] font-bold tracking-tight text-fg">More</h2>
           <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
-            {MORE.map((item) => (
+            {APP_MORE_LINKS.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}

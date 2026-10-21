@@ -78,7 +78,7 @@ export default function ProductsPage() {
         </form>
       </PageHeader>
 
-      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 app:py-6">
         <div className="scrollbar-none -mx-1 mb-8 flex gap-2 overflow-x-auto px-1 pb-1">
           <button
             onClick={() => {

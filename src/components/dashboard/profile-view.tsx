@@ -1,19 +1,21 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { Bell, KeyRound, Mail, MapPin, Phone, Save, User } from 'lucide-react';
+import { Bell, ChevronRight, KeyRound, LogOut, Mail, MapPin, Phone, Save, User } from 'lucide-react';
 import { authApi } from '@/lib/endpoints';
 import { toApiError } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { useAuth } from '@/components/providers/auth-provider';
+import { APP_MORE_LINKS } from '@/components/layout/app-links';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input, Select } from '@/components/ui/field';
 import { Avatar } from '@/components/ui/misc';
 
 export function ProfileView() {
-  const { user, setUser } = useAuth();
+  const { user, setUser, logout } = useAuth();
 
   const [profile, setProfile] = useState({
     name: '',
@@ -255,6 +257,34 @@ export function ProfileView() {
           </div>
         </form>
       </Card>
+
+      {/* App: this is the Account tab, so the links from the website's menus and
+          signing out live here too. */}
+      <div className="hidden space-y-4 app:block">
+        <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
+          {APP_MORE_LINKS.map((item) => (
+            <li key={item.href}>
+              <Link
+                href={item.href}
+                className="flex items-center gap-3 px-4 py-3.5 text-[14.5px] font-semibold text-fg transition-colors active:bg-surface-2"
+              >
+                <item.icon className="size-[18px] text-accent" />
+                <span className="flex-1">{item.label}</span>
+                <ChevronRight className="size-4 text-fg-subtle" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <Button
+          variant="outline"
+          size="lg"
+          onClick={() => void logout()}
+          className="w-full rounded-2xl border-danger/40 text-danger hover:border-danger hover:bg-danger-soft hover:text-danger"
+        >
+          <LogOut className="size-4" />
+          Sign out
+        </Button>
+      </div>
     </div>
   );
 }

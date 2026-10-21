@@ -62,7 +62,7 @@ function TrackContent() {
   const current = ticket ? stageIndex(ticket.status) : -1;
 
   return (
-    <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+    <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 app:py-6">
       <Card className="p-6 sm:p-8">
         <form
           onSubmit={(event) => {

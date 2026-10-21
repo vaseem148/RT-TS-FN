@@ -90,7 +90,7 @@ export default function AboutPage() {
         </div>
       </PageHeader>
 
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 app:py-8">
         <div className="grid gap-12 lg:grid-cols-2">
           <Reveal>
             <SectionHeading

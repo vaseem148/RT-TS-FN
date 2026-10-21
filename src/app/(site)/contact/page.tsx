@@ -193,7 +193,7 @@ export default function ContactPage() {
         description="Call, WhatsApp, email or raise a ticket — whichever suits you. Someone from our team answers every one of them."
       />
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_1.35fr]">
+      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_1.35fr] app:py-6">
         <Reveal className="flex flex-col gap-4">
           <Card className="p-6">
             <span className="grid size-11 place-items-center rounded-xl bg-brand-soft text-brand">

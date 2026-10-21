@@ -8,11 +8,12 @@
     "errorPath": "offline.html"
   },
   "android": {
-    "backgroundColor": "#05070e"
+    "backgroundColor": "#F4F3F9"
   },
   "plugins": {
     "SystemBars": {
-      "style": "DARK"
+      "style": "DARK",
+      "initialViewportFitValueHint": "cover"
     }
   },
   "appendUserAgent": "RenderwaysApp"

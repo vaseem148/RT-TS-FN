@@ -52,7 +52,7 @@ export default function PrivacyPage() {
         description="Plain-English summary of what we collect, why we need it, and what we will never do with it."
       />
 
-      <article className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+      <article className="mx-auto max-w-3xl px-4 py-14 sm:px-6 app:py-6">
         <p className="text-[13px] text-fg-subtle">
           Last updated {new Date().toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}
         </p>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Matches the website's dark background so the system bars blend in. -->
-    <color name="app_background">#05070E</color>
+    <!-- The app's purple header colour, so the system bars blend in from the first frame
+         (the website then fine-tunes them through the AppBars plugin). -->
+    <color name="app_background">#41249A</color>
 </resources>
