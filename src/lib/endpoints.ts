@@ -17,14 +17,24 @@ import type {
 export const authApi = {
   register: (payload: {
     name: string;
-    email: string;
+    email?: string;
     phone: string;
     password: string;
     company?: string;
   }) => api.post<{ token: string; user: User }>('/auth/register', payload).then((r) => r.data),
 
-  login: (payload: { email: string; password: string }) =>
-    api.post<{ token: string; user: User }>('/auth/login', payload).then((r) => r.data),
+  /**
+   * `identifier` is an email or a mobile number. Emails also go as `email`, so
+   * email sign-in keeps working against an API that predates mobile sign-in.
+   */
+  login: ({ identifier, password }: { identifier: string; password: string }) =>
+    api
+      .post<{ token: string; user: User }>('/auth/login', {
+        identifier,
+        password,
+        ...(identifier.includes('@') ? { email: identifier } : {}),
+      })
+      .then((r) => r.data),
 
   logout: () => api.post('/auth/logout').then((r) => r.data),
 

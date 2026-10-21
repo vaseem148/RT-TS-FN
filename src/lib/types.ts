@@ -24,7 +24,8 @@ export interface Address {
 export interface User {
   _id: string;
   name: string;
-  email: string;
+  /** Missing for people who signed up with just a mobile number. */
+  email?: string;
   phone: string;
   role: Role;
   avatar?: string;

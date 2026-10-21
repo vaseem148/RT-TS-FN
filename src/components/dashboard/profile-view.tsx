@@ -101,7 +101,7 @@ export function ProfileView() {
         <Avatar name={user?.name} src={user?.avatar} size="lg" />
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-extrabold tracking-tight text-fg">{user?.name}</h1>
-          <p className="text-[13.5px] text-fg-muted">{user?.email}</p>
+          <p className="text-[13.5px] text-fg-muted">{user?.email || user?.phone}</p>
           <div className="mt-2 flex flex-wrap gap-2">
             <span className="rounded-full border border-brand/25 bg-brand-soft px-2.5 py-0.5 text-[10.5px] font-bold tracking-wide text-brand uppercase">
               {user?.role}
@@ -139,9 +139,10 @@ export function ProfileView() {
           <Input
             label="Email address"
             value={user?.email ?? ''}
+            placeholder="Not added — you sign in with your mobile number"
             disabled
             icon={<Mail className="size-4" />}
-            hint="Contact support to change your email"
+            hint={user?.email ? 'Contact support to change your email' : undefined}
             containerClassName="sm:col-span-2"
           />
           <Input

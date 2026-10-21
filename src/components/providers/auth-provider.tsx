@@ -11,10 +11,12 @@ interface AuthContextValue {
   user: User | null;
   stats: Record<string, number>;
   loading: boolean;
-  login: (email: string, password: string) => Promise<User>;
+  /** `identifier` is an email or a mobile number. */
+  login: (identifier: string, password: string) => Promise<User>;
   register: (payload: {
     name: string;
-    email: string;
+    /** Optional — people can sign up with just a mobile number. */
+    email?: string;
     phone: string;
     password: string;
     company?: string;
@@ -63,8 +65,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     void refresh();
   }, [refresh]);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const data = await authApi.login({ email, password });
+  const login = useCallback(async (identifier: string, password: string) => {
+    const data = await authApi.login({ identifier, password });
     localStorage.setItem(TOKEN_KEY, data.token);
     setUser(data.user);
     void authApi.me().then((d) => setStats(d.stats || {}));
@@ -74,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = useCallback(
     async (payload: {
       name: string;
-      email: string;
+      email?: string;
       phone: string;
       password: string;
       company?: string;

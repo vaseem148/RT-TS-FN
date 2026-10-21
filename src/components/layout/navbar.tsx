@@ -146,7 +146,7 @@ export function Navbar() {
                       >
                         <div className="border-b border-line p-3.5">
                           <p className="truncate text-sm font-bold text-fg">{user.name}</p>
-                          <p className="truncate text-xs text-fg-muted">{user.email}</p>
+                          <p className="truncate text-xs text-fg-muted">{user.email || user.phone}</p>
                           <span className="mt-1.5 inline-block rounded-full border border-brand/25 bg-brand-soft px-2 py-0.5 text-[10px] font-bold tracking-wide text-brand uppercase">
                             {user.role}
                           </span>
@@ -244,7 +244,7 @@ export function Navbar() {
                     <Avatar name={user.name} src={user.avatar} />
                     <div className="min-w-0">
                       <p className="truncate text-sm font-bold text-fg">{user.name}</p>
-                      <p className="truncate text-xs text-fg-muted">{user.email}</p>
+                      <p className="truncate text-xs text-fg-muted">{user.email || user.phone}</p>
                     </div>
                   </div>
                 )}

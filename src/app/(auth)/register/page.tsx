@@ -4,15 +4,18 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { ArrowRight, Building2, Lock, Mail, Phone, User } from 'lucide-react';
+import { ArrowRight, Building2, Lock, Mail, Smartphone, User } from 'lucide-react';
 import { toApiError } from '@/lib/api';
+import { useIsApp } from '@/lib/app-mode';
 import { useAuth } from '@/components/providers/auth-provider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/field';
+import { AuthMethodToggle, type AuthMethod } from '@/components/auth/method-toggle';
 
 export default function RegisterPage() {
   const router = useRouter();
   const { register } = useAuth();
+  const isApp = useIsApp();
 
   const [form, setForm] = useState({
     name: '',
@@ -22,6 +25,8 @@ export default function RegisterPage() {
     password: '',
     confirmPassword: '',
   });
+  // Signing up with a mobile number needs no email at all.
+  const [method, setMethod] = useState<AuthMethod>('phone');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
@@ -44,13 +49,13 @@ export default function RegisterPage() {
     try {
       const user = await register({
         name: form.name,
-        email: form.email,
+        email: method === 'email' ? form.email : undefined,
         phone: form.phone,
         password: form.password,
         company: form.company,
       });
       toast.success(`Welcome to Renderways, ${user.name.split(' ')[0]}!`);
-      router.push('/portal');
+      router.push(isApp ? '/' : '/portal');
     } catch (error) {
       const apiError = toApiError(error);
       setErrors(apiError.details || {});
@@ -68,6 +73,15 @@ export default function RegisterPage() {
       </p>
 
       <form onSubmit={submit} className="mt-8 flex flex-col gap-4">
+        <AuthMethodToggle
+          id="register"
+          value={method}
+          onChange={(next) => {
+            setMethod(next);
+            setErrors({});
+          }}
+        />
+
         <Input
           label="Full name"
           required
@@ -79,29 +93,36 @@ export default function RegisterPage() {
           error={errors.name}
         />
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className={method === 'email' ? 'grid gap-4 sm:grid-cols-2' : 'grid gap-4'}>
+          {method === 'email' && (
+            <Input
+              label="Email address"
+              type="email"
+              required
+              autoComplete="email"
+              placeholder="you@example.com"
+              icon={<Mail className="size-4" />}
+              value={form.email}
+              onChange={update('email')}
+              error={errors.email}
+            />
+          )}
           <Input
-            label="Email address"
-            type="email"
-            required
-            autoComplete="email"
-            placeholder="you@example.com"
-            icon={<Mail className="size-4" />}
-            value={form.email}
-            onChange={update('email')}
-            error={errors.email}
-          />
-          <Input
-            label="Phone number"
+            label="Mobile number"
             type="tel"
+            inputMode="tel"
             required
             autoComplete="tel"
             placeholder="98765 43210"
-            icon={<Phone className="size-4" />}
+            icon={<Smartphone className="size-4" />}
             value={form.phone}
             onChange={update('phone')}
             error={errors.phone}
-            hint="Used for WhatsApp updates"
+            hint={
+              method === 'phone'
+                ? 'You will sign in with this number · WhatsApp updates'
+                : 'Used for WhatsApp updates'
+            }
           />
         </div>
 

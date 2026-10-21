@@ -221,13 +221,15 @@ export default function AdminUsersPage() {
               </div>
 
               <div className="mt-3.5 flex flex-col gap-1.5 border-t border-line pt-3.5 text-[12.5px]">
-                <a
-                  href={`mailto:${item.email}`}
-                  className="inline-flex items-center gap-2 truncate text-fg-muted transition-colors hover:text-brand"
-                >
-                  <Mail className="size-3.5 shrink-0" />
-                  {item.email}
-                </a>
+                {item.email && (
+                  <a
+                    href={`mailto:${item.email}`}
+                    className="inline-flex items-center gap-2 truncate text-fg-muted transition-colors hover:text-brand"
+                  >
+                    <Mail className="size-3.5 shrink-0" />
+                    {item.email}
+                  </a>
+                )}
                 <a
                   href={`tel:${item.phone}`}
                   className="inline-flex items-center gap-2 text-fg-muted transition-colors hover:text-brand"

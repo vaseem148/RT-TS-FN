@@ -4,12 +4,14 @@ import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { ArrowRight, Lock, Mail } from 'lucide-react';
+import { ArrowRight, Lock, Mail, Smartphone } from 'lucide-react';
 import { toApiError } from '@/lib/api';
+import { useIsApp } from '@/lib/app-mode';
 import { homeFor, useAuth } from '@/components/providers/auth-provider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/misc';
+import { AuthMethodToggle, type AuthMethod } from '@/components/auth/method-toggle';
 
 // One-click demo sign-in is for local development only — on the live site it
 // would hand the admin account to anyone who opens the login page. The list is
@@ -27,23 +29,36 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useAuth();
+  const isApp = useIsApp();
 
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [method, setMethod] = useState<AuthMethod>('phone');
+  const [form, setForm] = useState({ identifier: '', password: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
-  const submit = async (event: React.FormEvent, override?: { email: string; password: string }) => {
+  const switchMethod = (next: AuthMethod) => {
+    setMethod(next);
+    setForm((prev) => ({ ...prev, identifier: '' }));
+    setErrors({});
+  };
+
+  const submit = async (
+    event: React.FormEvent,
+    override?: { identifier: string; password: string }
+  ) => {
     event.preventDefault();
     const credentials = override ?? form;
 
     setLoading(true);
     setErrors({});
     try {
-      const user = await login(credentials.email, credentials.password);
+      const user = await login(credentials.identifier, credentials.password);
       toast.success(`Welcome back, ${user.name.split(' ')[0]}`);
       // Only same-site paths, so a crafted ?next= can't send people elsewhere.
       const next = searchParams.get('next');
-      router.push(next && /^\/(?![/\\])/.test(next) ? next : homeFor(user.role));
+      // In the app a customer's home is the app home screen.
+      const home = isApp && user.role === 'customer' ? '/' : homeFor(user.role);
+      router.push(next && /^\/(?![/\\])/.test(next) ? next : home);
     } catch (error) {
       const apiError = toApiError(error);
       setErrors(apiError.details || {});
@@ -61,17 +76,35 @@ function LoginForm() {
       </p>
 
       <form onSubmit={submit} className="mt-8 flex flex-col gap-4">
-        <Input
-          label="Email address"
-          type="email"
-          required
-          autoComplete="email"
-          placeholder="you@example.com"
-          icon={<Mail className="size-4" />}
-          value={form.email}
-          onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
-          error={errors.email}
-        />
+        <AuthMethodToggle id="login" value={method} onChange={switchMethod} />
+        {method === 'phone' ? (
+          <Input
+            key="phone"
+            label="Mobile number"
+            type="tel"
+            inputMode="tel"
+            required
+            autoComplete="tel"
+            placeholder="98765 43210"
+            icon={<Smartphone className="size-4" />}
+            value={form.identifier}
+            onChange={(event) => setForm((prev) => ({ ...prev, identifier: event.target.value }))}
+            error={errors.identifier || errors.email}
+          />
+        ) : (
+          <Input
+            key="email"
+            label="Email address"
+            type="email"
+            required
+            autoComplete="email"
+            placeholder="you@example.com"
+            icon={<Mail className="size-4" />}
+            value={form.identifier}
+            onChange={(event) => setForm((prev) => ({ ...prev, identifier: event.target.value }))}
+            error={errors.identifier || errors.email}
+          />
+        )}
         <Input
           label="Password"
           type="password"
@@ -108,7 +141,9 @@ function LoginForm() {
                 key={account.email}
                 type="button"
                 disabled={loading}
-                onClick={(event) => void submit(event, account)}
+                onClick={(event) =>
+                  void submit(event, { identifier: account.email, password: account.password })
+                }
                 className="rounded-xl border border-line bg-surface px-3 py-2.5 text-left transition-colors hover:border-brand/45 disabled:opacity-50"
               >
                 <span className="block text-[12.5px] font-bold text-fg">{account.label}</span>
