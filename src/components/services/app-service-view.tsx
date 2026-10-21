@@ -123,7 +123,7 @@ export function AppServiceView({ service, bookHref }: { service: Service; bookHr
                   >
                     {on ? (
                       <>
-                        Added <Check className="size-3.5" />
+                        Added <Check className="size-3.5 animate-[pop_0.35s_cubic-bezier(0.34,1.56,0.64,1)]" />
                       </>
                     ) : (
                       <>

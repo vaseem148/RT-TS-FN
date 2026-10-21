@@ -174,8 +174,8 @@ function NewTicketForm() {
       invalidate('portal:');
       invalidate('stats:');
 
-      toast.success(`Ticket ${ticket.ticketNumber} created — check your email and WhatsApp`);
-      router.push(`/portal/tickets/${ticket._id}`);
+      // The ticket page celebrates and says how updates will arrive.
+      router.push(`/portal/tickets/${ticket._id}?created=1`);
     } catch (error) {
       const apiError = toApiError(error);
       setErrors(apiError.details || {});

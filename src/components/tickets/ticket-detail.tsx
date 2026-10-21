@@ -25,6 +25,7 @@ import { ticketApi, userApi } from '@/lib/endpoints';
 import { toApiError } from '@/lib/api';
 import { invalidate } from '@/lib/use-api';
 import type { Ticket, User } from '@/lib/types';
+import { TicketCreated } from './ticket-created';
 import {
   absoluteUrl,
   cn,
@@ -432,6 +433,15 @@ export function TicketDetail({ ticketId, basePath }: { ticketId: string; basePat
   const [technicianId, setTechnicianId] = useState('');
   const [estimate, setEstimate] = useState('');
   const [busy, setBusy] = useState(false);
+  const [justCreated, setJustCreated] = useState(false);
+
+  // The new-ticket form lands here with ?created=1. Celebrate once, then drop
+  // the flag so a refresh doesn't repeat it.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('created') !== '1') return;
+    setJustCreated(true);
+    window.history.replaceState(null, '', window.location.pathname);
+  }, []);
 
   const isStaff = user?.role !== 'customer';
   const isAdmin = user?.role === 'admin';
@@ -574,6 +584,10 @@ export function TicketDetail({ ticketId, basePath }: { ticketId: string; basePat
         <ArrowLeft className="size-4" />
         All tickets
       </Link>
+
+      {justCreated && (
+        <TicketCreated ticketNumber={ticket.ticketNumber} onClose={() => setJustCreated(false)} />
+      )}
 
       {/* Header */}
       <Card className="p-5 sm:p-6">

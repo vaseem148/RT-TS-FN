@@ -507,6 +507,40 @@ html.app .app-hero .text-gradient {
   }
 }
 
+/* A quick springy pop — tab icons, toggled buttons, the raise action. */
+@keyframes pop {
+  0% {
+    transform: scale(0.6);
+  }
+  60% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Ticket-raised celebration: the check draws itself, sparks fly out. */
+@keyframes draw {
+  from {
+    stroke-dashoffset: var(--dash, 60);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes spark {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(-46px) scale(0.4);
+  }
+}
+
 @keyframes shimmer {
   from {
     background-position: 200% 0;

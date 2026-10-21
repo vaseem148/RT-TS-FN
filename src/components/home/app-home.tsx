@@ -71,8 +71,11 @@ export function AppHome() {
     <div className="pb-6">
       {/* Header */}
       <section className="app-hero relative isolate overflow-hidden px-5 pt-[calc(var(--safe-top)+1rem)] pb-14">
-        <span className="absolute -top-20 -right-16 -z-10 size-60 rounded-full bg-white/[0.07]" aria-hidden />
-        <span className="absolute top-28 -left-24 -z-10 size-44 rounded-full bg-white/[0.04]" aria-hidden />
+        <span className="absolute -top-20 -right-16 -z-10 size-60 animate-float rounded-full bg-white/[0.07]" aria-hidden />
+        <span
+          className="absolute top-28 -left-24 -z-10 size-44 animate-float rounded-full bg-white/[0.04] [animation-delay:-3.5s]"
+          aria-hidden
+        />
 
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -158,7 +161,7 @@ export function AppHome() {
               No service matches “{term}”. Try “laptop”, “CCTV” or “data”.
             </p>
           ) : (
-            <div className="grid grid-cols-3 gap-3">
+            <div className="stagger grid grid-cols-3 gap-3">
               {!tiles
                 ? Array.from({ length: 6 }).map((_, index) => (
                     <Skeleton key={index} className="h-30 rounded-2xl" />
@@ -237,7 +240,7 @@ export function AppHome() {
         {popular.length > 0 && (
           <section>
             <h2 className="mb-3 text-[16px] font-bold tracking-tight text-fg">Popular services</h2>
-            <div className="scrollbar-none -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1">
+            <div className="stagger scrollbar-none -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1">
               {popular.map((service) => (
                 <Link
                   key={service._id}

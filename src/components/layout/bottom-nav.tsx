@@ -78,7 +78,8 @@ export function BottomNav({
             name={item.icon}
             className={cn(
               'size-[21px] transition-transform duration-300',
-              isActive && '-translate-y-0.5 scale-110 app:translate-y-0 app:scale-100'
+              isActive &&
+                '-translate-y-0.5 scale-110 app:translate-y-0 app:scale-100 app:animate-[pop_0.4s_cubic-bezier(0.34,1.56,0.64,1)]'
             )}
           />
         </span>
@@ -124,7 +125,7 @@ export function BottomNav({
                 isActive ? 'text-brand' : 'text-fg-subtle'
               )}
             >
-              <span className="grid size-14 shrink-0 place-items-center rounded-full bg-linear-135 from-brand to-accent text-white shadow-lg shadow-brand/40 ring-[5px] ring-surface transition-transform duration-200 active:scale-90">
+              <span className="grid size-14 shrink-0 animate-[pop_0.5s_cubic-bezier(0.34,1.56,0.64,1)_0.2s_backwards] place-items-center rounded-full bg-linear-135 from-brand to-accent text-white shadow-lg shadow-brand/40 ring-[5px] ring-surface transition-transform duration-200 active:scale-90">
                 <Icon name={item.icon} className="size-6" />
               </span>
               <span className={cn('leading-none', isActive && 'font-bold')}>
