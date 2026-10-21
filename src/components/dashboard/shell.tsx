@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ExternalLink, LogOut, Menu, X } from 'lucide-react';
+import { ChevronLeft, ExternalLink, Info, LogOut, Mail, Menu, Package, Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/components/providers/auth-provider';
+import { useGoBack } from '@/components/layout/app-top-bar';
 import { BottomNav, type BottomNavItem } from '@/components/layout/bottom-nav';
 import { Logo } from '@/components/layout/logo';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
@@ -20,6 +21,14 @@ export interface NavItem {
   /** Match only on exact path — used for dashboard index links. */
   exact?: boolean;
 }
+
+/** Public pages the app has no navbar for — listed in the drawer instead. */
+const EXPLORE = [
+  { label: 'Products', href: '/products', icon: Package },
+  { label: 'Track a ticket', href: '/track', icon: Search },
+  { label: 'About us', href: '/about', icon: Info },
+  { label: 'Contact', href: '/contact', icon: Mail },
+];
 
 export function DashboardShell({
   nav,
@@ -36,8 +45,12 @@ export function DashboardShell({
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
+  const goBack = useGoBack();
 
   useEffect(() => setOpen(false), [pathname]);
+
+  // Inner pages (e.g. a ticket) get a back button in the app instead of the menu.
+  const isInner = ![...nav, ...(bottomNav ?? [])].some((item) => item.href === pathname);
 
   const isActive = (item: NavItem) =>
     item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -90,9 +103,21 @@ export function DashboardShell({
           <LogOut className="size-4" />
         </button>
       </div>
+      <div className="mt-2 hidden app:block">
+        {EXPLORE.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-fg-muted active:bg-surface-2"
+          >
+            <item.icon className="size-4 text-fg-subtle" />
+            {item.label}
+          </Link>
+        ))}
+      </div>
       <Link
         href="/"
-        className="mt-2 flex items-center gap-2 rounded-lg px-3 py-2 text-[12.5px] font-medium text-fg-subtle transition-colors hover:text-brand"
+        className="mt-2 flex items-center gap-2 rounded-lg px-3 py-2 text-[12.5px] font-medium text-fg-subtle transition-colors hover:text-brand app:hidden"
       >
         <ExternalLink className="size-3.5" />
         View public website
@@ -147,9 +172,21 @@ export function DashboardShell({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="glass sticky top-0 z-40 flex h-15 items-center gap-3 border-b border-line px-4 sm:px-6">
+          {isInner && (
+            <button
+              onClick={goBack}
+              className="-ml-1.5 hidden size-10 place-items-center rounded-full text-fg transition-transform active:scale-90 active:bg-surface-2 app:grid"
+              aria-label="Go back"
+            >
+              <ChevronLeft className="size-6" />
+            </button>
+          )}
           <button
             onClick={() => setOpen(true)}
-            className="grid size-9 place-items-center rounded-lg border border-line bg-surface text-fg lg:hidden"
+            className={cn(
+              'grid size-9 place-items-center rounded-lg border border-line bg-surface text-fg lg:hidden',
+              isInner && 'app:hidden'
+            )}
             aria-label="Open menu"
           >
             <Menu className="size-5" />

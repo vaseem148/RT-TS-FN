@@ -20,7 +20,15 @@ export interface BottomNavItem {
  * App-style tab bar for phones (the website doubles as the Android app).
  * Hidden on large screens, where the sidebar / top navbar take over.
  */
-export function BottomNav({ items, id }: { items: BottomNavItem[]; id: string }) {
+export function BottomNav({
+  items,
+  id,
+  className,
+}: {
+  items: BottomNavItem[];
+  id: string;
+  className?: string;
+}) {
   const pathname = usePathname();
 
   // The most specific match wins, so /portal/tickets/new lights up "Raise"
@@ -34,7 +42,10 @@ export function BottomNav({ items, id }: { items: BottomNavItem[]; id: string })
   return (
     <nav
       aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-50 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden"
+      className={cn(
+        'fixed inset-x-0 bottom-0 z-50 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden',
+        className
+      )}
     >
       <div className="mx-auto flex h-16 max-w-md items-center rounded-3xl border border-line bg-surface/95 px-1.5 shadow-2xl shadow-black/30 backdrop-blur-xl">
         {items.map((item) => {

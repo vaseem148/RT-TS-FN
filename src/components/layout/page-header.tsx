@@ -22,9 +22,9 @@ export function PageHeader({
       <div className="aurora opacity-70" aria-hidden />
       <div className="absolute inset-0 -z-10 grid-bg" aria-hidden />
 
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 app:py-6">
         {breadcrumbs.length > 0 && (
-          <nav aria-label="Breadcrumb" className="mb-5 flex items-center gap-1.5 text-[12.5px]">
+          <nav aria-label="Breadcrumb" className="mb-5 flex items-center gap-1.5 text-[12.5px] app:hidden">
             <Link href="/" className="text-fg-subtle transition-colors hover:text-brand">
               Home
             </Link>
@@ -44,20 +44,20 @@ export function PageHeader({
         )}
 
         {eyebrow && (
-          <span className="inline-flex items-center gap-2 rounded-full border border-brand/25 bg-brand-soft px-3.5 py-1.5 text-[11px] font-bold tracking-[0.14em] text-brand uppercase">
+          <span className="inline-flex items-center gap-2 rounded-full border border-brand/25 bg-brand-soft px-3.5 py-1.5 text-[11px] font-bold tracking-[0.14em] text-brand uppercase app:hidden">
             {eyebrow}
           </span>
         )}
 
-        <h1 className="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight text-fg sm:text-5xl">
+        <h1 className="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight text-fg sm:text-5xl app:mt-0 app:text-[1.65rem] app:leading-tight">
           {title}
         </h1>
 
         {description && (
-          <p className="mt-4 max-w-2xl text-[15.5px] leading-relaxed text-fg-muted">{description}</p>
+          <p className="mt-4 max-w-2xl text-[15.5px] leading-relaxed text-fg-muted app:mt-2 app:text-[14px]">{description}</p>
         )}
 
-        {children && <div className="mt-7">{children}</div>}
+        {children && <div className="mt-7 app:mt-5">{children}</div>}
       </div>
     </section>
   );

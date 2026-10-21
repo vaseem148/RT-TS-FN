@@ -3,17 +3,11 @@
 import { usePathname } from 'next/navigation';
 import { RequireRole } from '@/components/dashboard/guard';
 import { DashboardShell, type NavItem } from '@/components/dashboard/shell';
-import type { BottomNavItem } from '@/components/layout/bottom-nav';
+import { BOTTOM_TABS } from '@/lib/bottom-tabs';
 
 const NAV: NavItem[] = [
   { label: 'My day', href: '/tech', icon: 'LayoutDashboard', exact: true },
   { label: 'My tickets', href: '/tech/tickets', icon: 'Ticket' },
-  { label: 'Profile', href: '/tech/profile', icon: 'UserRound' },
-];
-
-const BOTTOM_NAV: BottomNavItem[] = [
-  { label: 'My day', href: '/tech', icon: 'LayoutDashboard', exact: true },
-  { label: 'Tickets', href: '/tech/tickets', icon: 'Ticket' },
   { label: 'Profile', href: '/tech/profile', icon: 'UserRound' },
 ];
 
@@ -29,7 +23,7 @@ export default function TechLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <RequireRole roles={['technician', 'admin']}>
-      <DashboardShell nav={NAV} bottomNav={BOTTOM_NAV} title={title}>
+      <DashboardShell nav={NAV} bottomNav={BOTTOM_TABS.technician} title={title}>
         {children}
       </DashboardShell>
     </RequireRole>

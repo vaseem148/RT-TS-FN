@@ -569,7 +569,7 @@ export function TicketDetail({ ticketId, basePath }: { ticketId: string; basePat
     <div className="flex flex-col gap-5">
       <Link
         href={basePath}
-        className="inline-flex w-fit items-center gap-1.5 text-[13px] font-semibold text-fg-muted transition-colors hover:text-brand"
+        className="inline-flex w-fit items-center gap-1.5 text-[13px] font-semibold text-fg-muted transition-colors hover:text-brand app:hidden"
       >
         <ArrowLeft className="size-4" />
         All tickets

@@ -14,5 +14,6 @@
     "SystemBars": {
       "style": "DARK"
     }
-  }
+  },
+  "appendUserAgent": "RenderwaysApp"
 }

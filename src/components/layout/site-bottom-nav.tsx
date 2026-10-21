@@ -1,22 +1,15 @@
 'use client';
 
-import { homeFor, useAuth } from '@/components/providers/auth-provider';
+import { useAuth } from '@/components/providers/auth-provider';
+import { tabsFor } from '@/lib/bottom-tabs';
 import { BottomNav } from './bottom-nav';
 
-/** Phone tab bar for the public site; "Account" leads to the user's own area. */
+/**
+ * Phone tab bar for the public site — signed-in users keep their own tabs here
+ * too. In the app it stays on large screens as well, since there is no navbar.
+ */
 export function SiteBottomNav() {
   const { user } = useAuth();
 
-  return (
-    <BottomNav
-      id="site"
-      items={[
-        { label: 'Home', href: '/', icon: 'House', exact: true },
-        { label: 'Services', href: '/services', icon: 'Wrench' },
-        { label: 'Raise a ticket', href: '/portal/tickets/new', icon: 'Plus', primary: true },
-        { label: 'Track', href: '/track', icon: 'Search' },
-        { label: user ? 'Account' : 'Sign in', href: user ? homeFor(user.role) : '/login', icon: 'UserRound' },
-      ]}
-    />
-  );
+  return <BottomNav id="site" items={tabsFor(user?.role)} className="app:lg:block" />;
 }

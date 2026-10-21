@@ -46,7 +46,7 @@ export function Navbar() {
   return (
     <>
       {/* Announcement strip */}
-      <div className="relative z-50 hidden overflow-hidden border-b border-line bg-surface-2/70 text-[12.5px] lg:block">
+      <div className="relative z-50 hidden overflow-hidden border-b border-line bg-surface-2/70 text-[12.5px] lg:block app:hidden">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-2">
           <p className="flex items-center gap-2 text-fg-muted">
             <span className="relative flex size-1.5">
@@ -77,7 +77,7 @@ export function Navbar() {
 
       <header
         className={cn(
-          'sticky top-0 z-50 w-full transition-all duration-300',
+          'sticky top-0 z-50 w-full transition-all duration-300 app:hidden',
           scrolled
             ? 'glass border-b border-line shadow-lg shadow-slate-950/5'
             : 'border-b border-transparent bg-transparent'

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { site } from '@/lib/site';
+import { APP_MODE_SCRIPT } from '@/lib/app-mode-script';
 import { Providers } from '@/components/providers';
 import './globals.css';
 
@@ -52,6 +53,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // instead of disabling it during route transitions.
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
+        {/* Runs before first paint so the Android app never flashes the website chrome. */}
+        <script dangerouslySetInnerHTML={{ __html: APP_MODE_SCRIPT }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

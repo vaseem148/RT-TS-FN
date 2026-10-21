@@ -3,6 +3,10 @@
 /* next-themes writes `class="dark"` onto <html>. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Inside the Android app the root gets `class="app"` (see lib/app-mode-script), so
+   `app:hidden` / `hidden app:block` swap the website chrome for app chrome. */
+@custom-variant app (&:where(.app, .app *));
+
 /* ------------------------------------------------------------------ *
  * Semantic tokens — one set per theme, consumed through @theme inline
  * ------------------------------------------------------------------ */
@@ -153,6 +157,23 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
+  }
+
+  /* App mode: behave like a native app, not a web page. */
+  html.app body {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    overscroll-behavior-y: none;
+  }
+  html.app input,
+  html.app textarea,
+  html.app [contenteditable] {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+  html.app ::-webkit-scrollbar {
+    display: none;
   }
 
   h1,

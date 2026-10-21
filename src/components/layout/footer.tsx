@@ -22,7 +22,7 @@ const supportLinks = [
 
 export function Footer() {
   return (
-    <footer className="relative mt-24 overflow-hidden border-t border-line bg-bg-subtle">
+    <footer className="relative mt-24 overflow-hidden border-t border-line bg-bg-subtle app:hidden">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-brand/45 to-transparent" />
 
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
