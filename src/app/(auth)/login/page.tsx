@@ -11,16 +11,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/field';
 import { Spinner } from '@/components/ui/misc';
 
-const DEMO_ACCOUNTS = [
-  { label: 'Customer', email: 'sumaiya@example.com', password: 'demo123' },
-  { label: 'Technician', email: 'bala@renderways.in', password: 'tech123' },
-  { label: 'Admin', email: 'admin@renderways.in', password: 'admin123' },
-];
-
 // One-click demo sign-in is for local development only — on the live site it
-// would hand the admin account to anyone who opens the login page.
-const SHOW_DEMO_ACCOUNTS =
-  process.env.NODE_ENV !== 'production' || process.env.NEXT_PUBLIC_SHOW_DEMO_ACCOUNTS === 'true';
+// would hand the admin account to anyone who opens the login page. The list is
+// empty in production builds, so the credentials never reach the bundle.
+const DEMO_ACCOUNTS =
+  process.env.NODE_ENV === 'production'
+    ? []
+    : [
+        { label: 'Customer', email: 'sumaiya@example.com', password: 'demo123' },
+        { label: 'Technician', email: 'bala@renderways.in', password: 'tech123' },
+        { label: 'Admin', email: 'admin@renderways.in', password: 'admin123' },
+      ];
 
 function LoginForm() {
   const router = useRouter();
@@ -94,7 +95,7 @@ function LoginForm() {
         </Link>
       </p>
 
-      {SHOW_DEMO_ACCOUNTS && (
+      {DEMO_ACCOUNTS.length > 0 && (
         <div className="mt-8 rounded-2xl border border-line bg-surface-2/60 p-4">
           <p className="text-[11px] font-bold tracking-wider text-fg-subtle uppercase">
             Demo accounts — one click to sign in
