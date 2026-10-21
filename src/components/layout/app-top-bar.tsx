@@ -3,12 +3,13 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import { useAuth } from '@/components/providers/auth-provider';
+import { useIsApp } from '@/lib/app-mode';
 import { tabsFor } from '@/lib/bottom-tabs';
-import { Logo } from './logo';
 import { ThemeToggle } from './theme-toggle';
 
+// A service page shows its name large in its own header, so the bar stays empty.
 const TITLES: [prefix: string, title: string][] = [
-  ['/services/', 'Service details'],
+  ['/services/', ''],
   ['/services', 'Services'],
   ['/products', 'Products'],
   ['/track', 'Track ticket'],
@@ -30,20 +31,23 @@ export function useGoBack() {
 }
 
 /**
- * Header for the public pages inside the Android app (replaces the website
- * navbar there): a back button on inner pages, the page title, theme toggle.
+ * Purple header for the public pages inside the Android app (replaces the
+ * website navbar there): a back button on inner pages, the page title and the
+ * theme toggle. The home screen draws its own header.
  */
 export function AppTopBar() {
   const pathname = usePathname();
   const { user } = useAuth();
+  const isApp = useIsApp();
   const goBack = useGoBack();
 
-  const isHome = pathname === '/';
-  const isTab = isHome || tabsFor(user?.role).some((tab) => tab.href === pathname);
+  if (pathname === '/') return null;
+
+  const isTab = tabsFor(user?.role, isApp).some((tab) => tab.href === pathname);
   const title = TITLES.find(([prefix]) => pathname.startsWith(prefix))?.[1] ?? '';
 
   return (
-    <header className="glass sticky top-0 z-50 hidden border-b border-line pt-[env(safe-area-inset-top)] app:block">
+    <header className="app-hero sticky top-0 z-50 hidden pt-(--safe-top) app:block">
       <div className="flex h-14 items-center gap-1.5 px-3">
         {!isTab && (
           <button
@@ -56,13 +60,9 @@ export function AppTopBar() {
           </button>
         )}
 
-        <div key={pathname} className="page-enter min-w-0 flex-1 px-1.5">
-          {isHome ? (
-            <Logo />
-          ) : (
-            <h1 className="truncate text-[17px] font-bold tracking-tight text-fg">{title}</h1>
-          )}
-        </div>
+        <p key={pathname} className="page-enter min-w-0 flex-1 truncate px-1.5 text-[17px] font-bold tracking-tight text-fg">
+          {title}
+        </p>
 
         <ThemeToggle className="rounded-full" />
       </div>

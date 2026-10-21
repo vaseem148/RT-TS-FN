@@ -79,14 +79,23 @@ function NewTicketForm() {
     preferredSlot: '',
   });
 
-  // Deep links from the services pages pre-select the right category.
+  // Deep links from the services pages pre-select the right category; the app
+  // also passes the items picked on the service page (one per line).
   useEffect(() => {
     const category = searchParams.get('category');
     const subject = searchParams.get('subject');
+    const items = searchParams.get('items');
     setForm((prev) => ({
       ...prev,
       category: category && CATEGORIES.includes(category) ? category : prev.category,
       subject: subject ? `${subject} — ` : prev.subject,
+      description:
+        items && !prev.description
+          ? `I need:\n${items
+              .split('\n')
+              .map((item) => `• ${item}`)
+              .join('\n')}\n\n`
+          : prev.description,
     }));
   }, [searchParams]);
 

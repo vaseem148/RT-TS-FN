@@ -3,14 +3,18 @@
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './auth-provider';
+import { SystemBarsSync } from './system-bars-sync';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
       <AuthProvider>
         {children}
+        <SystemBarsSync />
         <Toaster
           position="top-center"
+          // Clear of the status bar when the app draws edge to edge.
+          containerStyle={{ top: 'calc(var(--safe-top) + 16px)' }}
           toastOptions={{
             duration: 4000,
             style: {

@@ -24,7 +24,8 @@ export function RequireRole({
   useEffect(() => {
     if (loading) return;
     if (!user) {
-      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+      // Keep the query too, so a "Book a slot" pick survives signing in.
+      router.replace(`/login?next=${encodeURIComponent(pathname + window.location.search)}`);
       return;
     }
     if (!roles.includes(user.role)) router.replace(homeFor(user.role));

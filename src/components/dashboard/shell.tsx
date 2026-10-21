@@ -151,7 +151,7 @@ export function DashboardShell({
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="absolute inset-y-0 left-0 flex w-72 flex-col border-r border-line bg-surface"
+              className="absolute inset-y-0 left-0 flex w-72 flex-col border-r border-line bg-surface pt-(--safe-top) pb-(--safe-bottom)"
             >
               <div className="flex items-center justify-between border-b border-line p-4">
                 <Logo />
@@ -171,7 +171,7 @@ export function DashboardShell({
       </AnimatePresence>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="glass sticky top-0 z-40 flex h-15 items-center gap-3 border-b border-line px-4 sm:px-6">
+        <header className="app-hero glass sticky top-0 z-40 flex h-15 items-center gap-3 border-b border-line px-4 sm:px-6 app:h-[calc(3.75rem+var(--safe-top))] app:border-b-0 app:pt-(--safe-top)">
           {isInner && (
             <button
               onClick={goBack}

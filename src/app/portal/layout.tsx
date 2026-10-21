@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { RequireRole } from '@/components/dashboard/guard';
 import { DashboardShell, type NavItem } from '@/components/dashboard/shell';
+import { useIsApp } from '@/lib/app-mode';
 import { BOTTOM_TABS } from '@/lib/bottom-tabs';
 
 const NAV: NavItem[] = [
@@ -23,10 +24,11 @@ const TITLES: Record<string, string> = {
 export default function PortalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const title = TITLES[pathname] ?? 'Ticket details';
+  const isApp = useIsApp();
 
   return (
     <RequireRole roles={['customer', 'admin']}>
-      <DashboardShell nav={NAV} bottomNav={BOTTOM_TABS.customer} title={title}>
+      <DashboardShell nav={NAV} bottomNav={isApp ? BOTTOM_TABS.customerApp : BOTTOM_TABS.customer} title={title}>
         {children}
       </DashboardShell>
     </RequireRole>

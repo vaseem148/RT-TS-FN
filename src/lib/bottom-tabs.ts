@@ -8,16 +8,24 @@ export const BOTTOM_TABS = {
   guest: [
     { label: 'Home', href: '/', icon: 'House', exact: true },
     { label: 'Services', href: '/services', icon: 'Wrench' },
-    { label: 'Raise a ticket', href: '/portal/tickets/new', icon: 'Plus', primary: true },
+    { label: 'Raise a ticket', shortLabel: 'Raise', href: '/portal/tickets/new', icon: 'Plus', primary: true },
     { label: 'Track', href: '/track', icon: 'Search' },
     { label: 'Sign in', href: '/login', icon: 'UserRound' },
   ],
   customer: [
     { label: 'Home', href: '/portal', icon: 'House', exact: true },
     { label: 'Tickets', href: '/portal/tickets', icon: 'Ticket' },
-    { label: 'Raise a ticket', href: '/portal/tickets/new', icon: 'Plus', primary: true },
+    { label: 'Raise a ticket', shortLabel: 'Raise', href: '/portal/tickets/new', icon: 'Plus', primary: true },
     { label: 'Services', href: '/services', icon: 'Wrench' },
     { label: 'Profile', href: '/portal/profile', icon: 'UserRound' },
+  ],
+  /** In the app a customer's Home is the app home screen, not the portal overview. */
+  customerApp: [
+    { label: 'Home', href: '/', icon: 'House', exact: true },
+    { label: 'Tickets', href: '/portal/tickets', icon: 'Ticket' },
+    { label: 'Raise a ticket', shortLabel: 'Raise', href: '/portal/tickets/new', icon: 'Plus', primary: true },
+    { label: 'Services', href: '/services', icon: 'Wrench' },
+    { label: 'Account', href: '/portal/profile', icon: 'UserRound' },
   ],
   technician: [
     { label: 'My day', href: '/tech', icon: 'LayoutDashboard', exact: true },
@@ -32,9 +40,9 @@ export const BOTTOM_TABS = {
   ],
 } satisfies Record<string, BottomNavItem[]>;
 
-export function tabsFor(role?: string): BottomNavItem[] {
+export function tabsFor(role?: string, isApp = false): BottomNavItem[] {
   if (role === 'admin') return BOTTOM_TABS.admin;
   if (role === 'technician') return BOTTOM_TABS.technician;
-  if (role === 'customer') return BOTTOM_TABS.customer;
+  if (role === 'customer') return isApp ? BOTTOM_TABS.customerApp : BOTTOM_TABS.customer;
   return BOTTOM_TABS.guest;
 }

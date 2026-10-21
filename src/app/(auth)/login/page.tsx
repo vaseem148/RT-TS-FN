@@ -41,7 +41,9 @@ function LoginForm() {
     try {
       const user = await login(credentials.email, credentials.password);
       toast.success(`Welcome back, ${user.name.split(' ')[0]}`);
-      router.push(searchParams.get('next') || homeFor(user.role));
+      // Only same-site paths, so a crafted ?next= can't send people elsewhere.
+      const next = searchParams.get('next');
+      router.push(next && /^\/(?![/\\])/.test(next) ? next : homeFor(user.role));
     } catch (error) {
       const apiError = toApiError(error);
       setErrors(apiError.details || {});

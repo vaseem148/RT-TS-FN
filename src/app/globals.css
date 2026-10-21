@@ -47,6 +47,13 @@
   --glow-1: rgba(14, 165, 233, 0.18);
   --glow-2: rgba(124, 58, 237, 0.14);
   --grid-line: rgba(2, 6, 23, 0.055);
+
+  --hero: #41249a;
+
+  /* System-bar insets. Capacitor injects --safe-area-inset-* when the app
+     draws edge to edge; everywhere else this falls back to env() (or 0). */
+  --safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
 }
 
 .dark {
@@ -87,6 +94,85 @@
   --grid-line: rgba(148, 163, 184, 0.07);
 }
 
+/* Android app palette — deep purple headers, magenta actions, lavender canvas.
+   Only inside the app (html.app); the website keeps the tokens above. */
+html.app {
+  --bg: #f4f3f9;
+  --bg-subtle: #f4f3f9;
+  --surface: #ffffff;
+  --surface-2: #f0eef8;
+  --surface-glass: 255 255 255 / 0.9;
+  --border: #e8e5f3;
+  --border-strong: #d4cfe8;
+
+  --fg: #1b1838;
+  --fg-muted: #5e5a7d;
+  --fg-subtle: #918dad;
+
+  --brand: #e0177b;
+  --brand-strong: #bd0f66;
+  --brand-soft: #fde8f2;
+  --brand-fg: #ffffff;
+
+  --accent: #4a2a9d;
+  --accent-soft: #ece8fa;
+
+  --ring: #e0177b;
+  --glow-1: rgba(224, 23, 123, 0.12);
+  --glow-2: rgba(74, 42, 157, 0.12);
+
+  --hero: #41249a;
+}
+
+html.app.dark {
+  --bg: #0e0a1d;
+  --bg-subtle: #0e0a1d;
+  --surface: #17122d;
+  --surface-2: #211a3e;
+  --surface-glass: 23 18 45 / 0.9;
+  --border: #2a2348;
+  --border-strong: #3c3363;
+
+  --fg: #f2effc;
+  --fg-muted: #aaa4c8;
+  --fg-subtle: #7b7599;
+
+  --brand: #e8317f;
+  --brand-strong: #f472b6;
+  --brand-soft: #3a1030;
+  --brand-fg: #ffffff;
+
+  --accent: #b29dfb;
+  --accent-soft: #261d4d;
+
+  --ring: #e8317f;
+  --glow-1: rgba(232, 49, 127, 0.14);
+  --glow-2: rgba(178, 157, 251, 0.12);
+
+  --hero: #251660;
+}
+
+/* App headers are deep purple. Recolouring the tokens inside them makes text,
+   outline buttons, inputs and toggles read light-on-purple with no per-component
+   overrides. Unlayered on purpose, so it beats utilities like `glass`. */
+html.app .app-hero {
+  background-color: var(--hero);
+  color: #ffffff;
+  --fg: #ffffff;
+  --fg-muted: rgb(255 255 255 / 0.78);
+  --fg-subtle: rgb(255 255 255 / 0.62);
+  --border: rgb(255 255 255 / 0.18);
+  --border-strong: rgb(255 255 255 / 0.32);
+  --surface: rgb(255 255 255 / 0.1);
+  --surface-2: rgb(255 255 255 / 0.12);
+  --brand-soft: rgb(255 255 255 / 0.14);
+  --accent-soft: rgb(255 255 255 / 0.14);
+}
+
+html.app .app-hero .text-gradient {
+  background-image: linear-gradient(100deg, #ffffff, #ffc6e3);
+}
+
 @theme inline {
   --color-bg: var(--bg);
   --color-bg-subtle: var(--bg-subtle);
@@ -117,6 +203,7 @@
   --color-info-soft: var(--info-soft);
 
   --color-ring: var(--ring);
+  --color-hero: var(--hero);
 
   --font-sans:
     'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;

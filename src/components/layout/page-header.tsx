@@ -18,11 +18,18 @@ export function PageHeader({
   className?: string;
 }) {
   return (
-    <section className={cn('relative isolate overflow-hidden border-b border-line', className)}>
-      <div className="aurora opacity-70" aria-hidden />
-      <div className="absolute inset-0 -z-10 grid-bg" aria-hidden />
+    // In the app this becomes the purple app header (see .app-hero).
+    <section
+      className={cn('app-hero relative isolate overflow-hidden border-b border-line app:border-b-0', className)}
+    >
+      <div className="aurora opacity-70 app:hidden" aria-hidden />
+      <div className="absolute inset-0 -z-10 grid-bg app:hidden" aria-hidden />
+      <span
+        className="absolute top-6 -right-24 -z-10 hidden size-56 rounded-full bg-white/[0.07] app:block"
+        aria-hidden
+      />
 
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 app:py-6">
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 app:pt-2 app:pb-8">
         {breadcrumbs.length > 0 && (
           <nav aria-label="Breadcrumb" className="mb-5 flex items-center gap-1.5 text-[12.5px] app:hidden">
             <Link href="/" className="text-fg-subtle transition-colors hover:text-brand">

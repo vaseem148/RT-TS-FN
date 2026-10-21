@@ -9,7 +9,7 @@ export default function MyTicketsPage() {
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-extrabold tracking-tight text-fg">My tickets</h1>
+          <h1 className="text-xl font-extrabold tracking-tight text-fg app:hidden">My tickets</h1>
           <p className="mt-1 text-[13.5px] text-fg-muted">
             Every service request you have raised with Renderways, newest first.
           </p>

@@ -1,15 +1,27 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { useAuth } from '@/components/providers/auth-provider';
+import { useIsApp } from '@/lib/app-mode';
 import { tabsFor } from '@/lib/bottom-tabs';
 import { BottomNav } from './bottom-nav';
 
 /**
  * Phone tab bar for the public site — signed-in users keep their own tabs here
- * too. In the app it stays on large screens as well, since there is no navbar.
+ * too. In the app it stays on large screens as well, since there is no navbar,
+ * and gives way to the booking bar on a service page.
  */
 export function SiteBottomNav() {
   const { user } = useAuth();
+  const isApp = useIsApp();
+  const pathname = usePathname();
+  const isServicePage = /^\/services\/[^/]+$/.test(pathname);
 
-  return <BottomNav id="site" items={tabsFor(user?.role)} className="app:lg:block" />;
+  return (
+    <BottomNav
+      id="site"
+      items={tabsFor(user?.role, isApp)}
+      className={isServicePage ? 'app:hidden' : 'app:lg:block'}
+    />
+  );
 }

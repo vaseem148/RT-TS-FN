@@ -54,7 +54,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       {/* Form panel */}
       <main className="relative flex flex-col">
-        <div className="flex items-center justify-between p-5 sm:p-6">
+        <div className="app-hero flex items-center justify-between p-5 sm:p-6 app:pt-[calc(var(--safe-top)+0.75rem)] app:pb-3">
           <Link
             href="/"
             className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-fg-muted transition-colors hover:text-brand"
