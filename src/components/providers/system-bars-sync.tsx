@@ -11,6 +11,15 @@ interface CapacitorBridge {
   ) => Promise<unknown>;
 }
 
+/** Any CSS colour as #rrggbb — the CSS build shortens tokens (#ffffff → #fff), which Android rejects. */
+function toHex(color: string) {
+  const context = document.createElement('canvas').getContext('2d');
+  if (!context) return color;
+  context.fillStyle = '#000000';
+  context.fillStyle = color;
+  return String(context.fillStyle);
+}
+
 /**
  * Matches Android's status and navigation bars to the app: purple behind the
  * status bar (every app screen starts with the purple header) and the tab bar
@@ -30,8 +39,8 @@ export function SystemBarsSync() {
     const apply = () => {
       const styles = getComputedStyle(document.documentElement);
       call('AppBars', 'setColors', {
-        top: styles.getPropertyValue('--hero').trim(),
-        bottom: styles.getPropertyValue('--surface').trim(),
+        top: toHex(styles.getPropertyValue('--hero').trim()),
+        bottom: toHex(styles.getPropertyValue('--surface').trim()),
         darkStatusIcons: false,
         darkNavIcons: !isDark,
       }).catch(() => {
