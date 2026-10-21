@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { RequireRole } from '@/components/dashboard/guard';
 import { DashboardShell, type NavItem } from '@/components/dashboard/shell';
+import type { BottomNavItem } from '@/components/layout/bottom-nav';
 
 const NAV: NavItem[] = [
   { label: 'Dashboard', href: '/admin', icon: 'LayoutDashboard', exact: true },
@@ -10,6 +11,13 @@ const NAV: NavItem[] = [
   { label: 'Customers & staff', href: '/admin/users', icon: 'Users' },
   { label: 'Enquiries', href: '/admin/enquiries', icon: 'Inbox' },
   { label: 'My portal', href: '/portal', icon: 'UserRound' },
+];
+
+const BOTTOM_NAV: BottomNavItem[] = [
+  { label: 'Dashboard', href: '/admin', icon: 'LayoutDashboard', exact: true },
+  { label: 'Tickets', href: '/admin/tickets', icon: 'Ticket' },
+  { label: 'Users', href: '/admin/users', icon: 'Users' },
+  { label: 'Enquiries', href: '/admin/enquiries', icon: 'Inbox' },
 ];
 
 const TITLES: Record<string, string> = {
@@ -25,7 +33,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <RequireRole roles={['admin']}>
-      <DashboardShell nav={NAV} title={title}>
+      <DashboardShell nav={NAV} bottomNav={BOTTOM_NAV} title={title}>
         {children}
       </DashboardShell>
     </RequireRole>

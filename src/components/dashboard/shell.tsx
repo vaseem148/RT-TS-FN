@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ExternalLink, LogOut, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/components/providers/auth-provider';
+import { BottomNav, type BottomNavItem } from '@/components/layout/bottom-nav';
 import { Logo } from '@/components/layout/logo';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { Avatar, Icon } from '@/components/ui/misc';
@@ -22,10 +23,13 @@ export interface NavItem {
 
 export function DashboardShell({
   nav,
+  bottomNav,
   title,
   children,
 }: {
   nav: NavItem[];
+  /** Phone tab bar; the full `nav` stays in the drawer. */
+  bottomNav?: BottomNavItem[];
   title: string;
   children: React.ReactNode;
 }) {
@@ -154,8 +158,10 @@ export function DashboardShell({
           <ThemeToggle />
         </header>
 
-        <main className="flex-1 p-4 sm:p-6">{children}</main>
+        <main className={cn('flex-1 p-4 sm:p-6', bottomNav && 'pb-28 lg:pb-6')}>{children}</main>
       </div>
+
+      {bottomNav && <BottomNav items={bottomNav} id="dashboard" />}
     </div>
   );
 }

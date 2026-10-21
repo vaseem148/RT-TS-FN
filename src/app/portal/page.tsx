@@ -96,7 +96,7 @@ export default function PortalOverview() {
         />
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[1.6fr_1fr]">
+      <div className="grid gap-5 lg:grid-cols-[1.6fr_1fr] [&>*]:min-w-0">
         <div>
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-[15px] font-bold text-fg">Recent tickets</h2>

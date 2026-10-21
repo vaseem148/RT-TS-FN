@@ -16,7 +16,7 @@ export function FloatingActions() {
   }, []);
 
   return (
-    <div className="pointer-events-none fixed right-4 bottom-4 z-40 flex flex-col items-end gap-2.5 sm:right-6 sm:bottom-6">
+    <div className="pointer-events-none fixed right-4 bottom-28 z-40 flex flex-col items-end gap-2.5 sm:right-6 lg:bottom-6">
       <AnimatePresence>
         {showTop && (
           <motion.button
