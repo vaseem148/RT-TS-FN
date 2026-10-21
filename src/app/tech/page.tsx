@@ -92,7 +92,7 @@ export default function TechDashboardPage() {
         </div>
       </Card>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard label="Active jobs" value={kpis.active} icon="Ticket" tone="brand" href="/tech/tickets" />
         <StatCard label="In progress" value={kpis.inProgress} icon="Activity" tone="accent" />
         <StatCard

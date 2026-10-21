@@ -12,7 +12,7 @@ export function Card({
         'rounded-2xl border border-line',
         glass ? 'glass' : 'bg-surface',
         hover &&
-          'card-hover hover:-translate-y-1 hover:border-brand/40 hover:shadow-2xl hover:shadow-brand/10',
+          'card-hover hover:-translate-y-1 hover:border-brand/40 hover:shadow-2xl hover:shadow-brand/10 active:scale-[0.985]',
         className
       )}
       {...props}

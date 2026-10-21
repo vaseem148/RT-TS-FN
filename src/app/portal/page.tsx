@@ -72,7 +72,7 @@ export default function PortalOverview() {
         </div>
       </Card>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Recent tickets"
           value={counts.total}
@@ -130,7 +130,7 @@ export default function PortalOverview() {
               />
             </Card>
           ) : (
-            <div className="flex flex-col gap-3">
+            <div className="stagger flex flex-col gap-3">
               {tickets.map((ticket) => (
                 <TicketCard key={ticket._id} ticket={ticket} basePath="/portal/tickets" />
               ))}

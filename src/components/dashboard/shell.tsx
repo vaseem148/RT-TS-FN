@@ -45,7 +45,7 @@ export function DashboardShell({
           key={item.href}
           href={item.href}
           className={cn(
-            'group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold transition-all',
+            'group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold transition-all active:scale-[0.98]',
             isActive(item)
               ? 'bg-brand-soft text-brand shadow-sm'
               : 'text-fg-muted hover:bg-surface-2 hover:text-fg'

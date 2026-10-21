@@ -29,7 +29,7 @@ export function TicketCard({ ticket, basePath }: { ticket: Ticket; basePath: str
   return (
     <Link
       href={`${basePath}/${ticket._id}`}
-      className="group block rounded-2xl border border-line bg-surface p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-lg hover:shadow-brand/8 sm:p-5"
+      className="group block rounded-2xl border border-line bg-surface p-4 transition-all duration-300 active:scale-[0.985] hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-lg hover:shadow-brand/8 sm:p-5"
     >
       <div className="flex items-start gap-4">
         <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-linear-135 from-brand/12 to-accent/12 text-brand">
@@ -217,7 +217,7 @@ export function TicketList({
           />
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="stagger flex flex-col gap-3">
           {tickets.map((ticket) => (
             <TicketCard key={ticket._id} ticket={ticket} basePath={basePath} />
           ))}

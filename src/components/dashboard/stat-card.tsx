@@ -61,7 +61,7 @@ export function StatCard({
 
   const classes = cn(
     'rounded-2xl border border-line bg-surface p-4 transition-all duration-300',
-    href && 'hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-lg hover:shadow-brand/8',
+    href && 'hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-lg hover:shadow-brand/8 active:scale-[0.98]',
     className
   );
 

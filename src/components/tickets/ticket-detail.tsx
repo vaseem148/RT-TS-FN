@@ -291,7 +291,7 @@ function Timeline({ ticket }: { ticket: Ticket }) {
   return (
     <Card className="p-5">
       <h2 className="text-[15px] font-bold text-fg">Activity</h2>
-      <ol className="mt-4 space-y-4">
+      <ol className="stagger mt-4 space-y-4">
         {[...ticket.activity].reverse().map((entry, index, all) => (
           <li key={entry._id} className="flex gap-3">
             <span className="relative flex flex-col items-center">

@@ -70,7 +70,7 @@ export default function AdminDashboardPage() {
         </Button>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Open tickets"
           value={kpis.openTickets}
@@ -287,7 +287,7 @@ export default function AdminDashboardPage() {
         </div>
       </Card>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="stagger grid gap-4 sm:grid-cols-3">
         <StatCard label="Total customers" value={kpis.customers} icon="Users" tone="brand" href="/admin/users" />
         <StatCard label="Active technicians" value={kpis.technicians} icon="Wrench" tone="accent" href="/admin/users" />
         <StatCard
