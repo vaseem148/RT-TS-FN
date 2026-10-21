@@ -1,0 +1,18 @@
+{
+  "appId": "in.systimus.rtpl",
+  "appName": "Renderways",
+  "webDir": "capacitor-shell",
+  "server": {
+    "url": "https://rtpl.systimus.in",
+    "cleartext": false,
+    "errorPath": "offline.html"
+  },
+  "android": {
+    "backgroundColor": "#05070e"
+  },
+  "plugins": {
+    "SystemBars": {
+      "style": "DARK"
+    }
+  }
+}

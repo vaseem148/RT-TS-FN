@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Renderways</string>
+    <string name="title_activity_main">Renderways</string>
+    <string name="package_name">in.systimus.rtpl</string>
+    <string name="custom_url_scheme">in.systimus.rtpl</string>
+</resources>

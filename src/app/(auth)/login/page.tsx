@@ -17,6 +17,11 @@ const DEMO_ACCOUNTS = [
   { label: 'Admin', email: 'admin@renderways.in', password: 'admin123' },
 ];
 
+// One-click demo sign-in is for local development only — on the live site it
+// would hand the admin account to anyone who opens the login page.
+const SHOW_DEMO_ACCOUNTS =
+  process.env.NODE_ENV !== 'production' || process.env.NEXT_PUBLIC_SHOW_DEMO_ACCOUNTS === 'true';
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -89,25 +94,27 @@ function LoginForm() {
         </Link>
       </p>
 
-      <div className="mt-8 rounded-2xl border border-line bg-surface-2/60 p-4">
-        <p className="text-[11px] font-bold tracking-wider text-fg-subtle uppercase">
-          Demo accounts — one click to sign in
-        </p>
-        <div className="mt-3 grid gap-2 sm:grid-cols-3">
-          {DEMO_ACCOUNTS.map((account) => (
-            <button
-              key={account.email}
-              type="button"
-              disabled={loading}
-              onClick={(event) => void submit(event, account)}
-              className="rounded-xl border border-line bg-surface px-3 py-2.5 text-left transition-colors hover:border-brand/45 disabled:opacity-50"
-            >
-              <span className="block text-[12.5px] font-bold text-fg">{account.label}</span>
-              <span className="block truncate text-[10.5px] text-fg-subtle">{account.email}</span>
-            </button>
-          ))}
+      {SHOW_DEMO_ACCOUNTS && (
+        <div className="mt-8 rounded-2xl border border-line bg-surface-2/60 p-4">
+          <p className="text-[11px] font-bold tracking-wider text-fg-subtle uppercase">
+            Demo accounts — one click to sign in
+          </p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+            {DEMO_ACCOUNTS.map((account) => (
+              <button
+                key={account.email}
+                type="button"
+                disabled={loading}
+                onClick={(event) => void submit(event, account)}
+                className="rounded-xl border border-line bg-surface px-3 py-2.5 text-left transition-colors hover:border-brand/45 disabled:opacity-50"
+              >
+                <span className="block text-[12.5px] font-bold text-fg">{account.label}</span>
+                <span className="block truncate text-[10.5px] text-fg-subtle">{account.email}</span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
