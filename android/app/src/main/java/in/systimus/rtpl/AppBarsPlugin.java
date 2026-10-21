@@ -43,6 +43,10 @@ public class AppBarsPlugin extends Plugin {
         final boolean darkNav = darkNavIcons;
         getBridge()
             .executeOnMainThread(() -> {
+                if (getActivity() == null) {
+                    call.reject("No activity");
+                    return;
+                }
                 Window window = getActivity().getWindow();
                 // Bar colours apply up to Android 14; from 15 the page itself shows behind the bars.
                 window.setStatusBarColor(top);
