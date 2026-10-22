@@ -3,42 +3,97 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, ChevronRight, MapPin, MessageCircle, Phone, Search, Ticket, X } from 'lucide-react';
+import {
+  ArrowRight,
+  ChevronRight,
+  MapPin,
+  MessageCircle,
+  Phone,
+  Plus,
+  Search,
+  ShieldCheck,
+  Ticket,
+  X,
+} from 'lucide-react';
 import { site, whatsappLink } from '@/lib/site';
-import { serviceApi, ticketApi } from '@/lib/endpoints';
+import { productApi, serviceApi, ticketApi } from '@/lib/endpoints';
 import { useApi } from '@/lib/use-api';
 import { useIsApp } from '@/lib/app-mode';
 import { formatCurrency } from '@/lib/utils';
 import { homeFor, useAuth } from '@/components/providers/auth-provider';
+import { ART_TINTS, ArtTile, ServiceArt, artForProduct, artForService } from '@/components/app/service-art';
 import { APP_MORE_LINKS } from '@/components/layout/app-links';
 import { AppMenu } from '@/components/layout/app-menu';
+import { Logo } from '@/components/layout/logo';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { TicketCard } from '@/components/tickets/ticket-list';
 import { Button } from '@/components/ui/button';
-import { Icon, Skeleton, Spinner } from '@/components/ui/misc';
+import { Skeleton, Spinner } from '@/components/ui/misc';
 
 const TICKET_NUMBER = /^RW-?\d/i;
 
-const ACTIONS = [
-  { label: 'Raise ticket', href: '/portal/tickets/new', icon: Ticket, tone: 'bg-brand-soft text-brand' },
-  { label: 'Track ticket', href: '/track', icon: Search, tone: 'bg-accent-soft text-accent' },
-  { label: 'Call us', href: `tel:${site.primaryPhone}`, icon: Phone, tone: 'bg-success-soft text-success' },
-  { label: 'WhatsApp', href: whatsappLink(), icon: MessageCircle, tone: 'bg-success-soft text-success' },
+// "More support" cards — the website's Raise a ticket button and its floating Call / WhatsApp.
+const SUPPORT = [
+  {
+    label: 'Raise a ticket',
+    sub: 'Engineer at your door',
+    href: '/portal/tickets/new',
+    icon: Ticket,
+    bg: '#EAE4FF',
+    chip: '#4C1D95',
+    ink: '#4C1D95',
+  },
+  {
+    label: 'Call us 24/7',
+    sub: 'Emergency line',
+    href: `tel:${site.primaryPhone}`,
+    icon: Phone,
+    bg: '#DCEBFF',
+    chip: '#1849A9',
+    ink: '#1849A9',
+  },
+  {
+    label: 'WhatsApp',
+    sub: 'Chat with our team',
+    href: whatsappLink(),
+    icon: MessageCircle,
+    bg: '#DDF4E8',
+    chip: '#1F7A4D',
+    ink: '#14532D',
+  },
 ];
 
+function SectionTitle({ title, href, action = 'See all' }: { title: string; href?: string; action?: string }) {
+  return (
+    <div className="mb-3 flex items-end justify-between gap-3">
+      <h2 className="text-[19px] font-extrabold tracking-tight text-fg">{title}</h2>
+      {href && (
+        <Link href={href} className="shrink-0 text-[14px] font-bold text-accent">
+          {action}
+        </Link>
+      )}
+    </div>
+  );
+}
+
 /**
- * Home screen of the Android app (the website keeps its marketing home page):
- * search, service categories, offers and — for customers — their tickets.
- * Staff skip it and land on their own dashboards.
+ * Home screen of the Android app (the website keeps its marketing home page),
+ * laid out like the app design prototype: header, search, ticket tracking,
+ * service categories, support, shop and offers — and, for customers, their
+ * tickets. Staff skip it and land on their own dashboards.
  */
 export function AppHome() {
   const isApp = useIsApp();
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, stats, loading } = useAuth();
   const [query, setQuery] = useState('');
+  const [ticketNo, setTicketNo] = useState('');
 
   const isCustomer = user?.role === 'customer';
   const { data: services } = useApi('services', () => serviceApi.list(), { ttl: 300_000 });
+  const { data: shop } = useApi('products:app-home', () => productApi.list({ limit: 8 }), {
+    ttl: 300_000,
+  });
   const { data: recent } = useApi(isApp && isCustomer ? 'tickets:app-home' : null, () =>
     ticketApi.list({ limit: 3, sort: '-createdAt' })
   );
@@ -56,10 +111,16 @@ export function AppHome() {
     );
   }, [services, term]);
 
-  const submit = (event: React.FormEvent) => {
+  const search = (event: React.FormEvent) => {
     event.preventDefault();
     if (TICKET_NUMBER.test(term)) router.push(`/track?t=${encodeURIComponent(term.toUpperCase())}`);
     else if (matches?.length === 1) router.push(`/services/${matches[0].slug}`);
+  };
+
+  const track = (event: React.FormEvent) => {
+    event.preventDefault();
+    const value = ticketNo.trim().toUpperCase();
+    router.push(value ? `/track?t=${encodeURIComponent(value)}` : '/track');
   };
 
   if (loading || (user && !isCustomer)) {
@@ -74,271 +135,378 @@ export function AppHome() {
   const tiles = searching ? matches : matches?.slice(0, 6);
   const amc = services?.find((service) => service.ticketCategory === 'amc');
   const popular = services?.filter((service) => service.isFeatured) ?? [];
+  const products = shop?.products ?? [];
 
   return (
-    <div className="pb-6">
+    <div className="pb-8">
       {/* Header */}
-      <section className="app-hero relative isolate overflow-hidden px-5 pt-[calc(var(--safe-top)+1rem)] pb-14">
-        <span className="absolute -top-20 -right-16 -z-10 size-60 animate-float rounded-full bg-white/[0.07]" aria-hidden />
+      <section className="app-hero relative isolate overflow-hidden px-4 pt-[calc(var(--safe-top)+1rem)] pb-[4.4rem]">
         <span
-          className="absolute top-28 -left-24 -z-10 size-44 animate-float rounded-full bg-white/[0.04] [animation-delay:-3.5s]"
+          className="rw-aur1 absolute -top-24 -right-24 -z-10 size-72 rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(226,24,125,0.38) 0%, rgba(226,24,125,0) 70%)' }}
+          aria-hidden
+        />
+        <span
+          className="rw-aur2 absolute -bottom-28 -left-20 -z-10 size-64 rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(123,97,255,0.6) 0%, rgba(123,97,255,0) 70%)' }}
           aria-hidden
         />
 
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-[11px] font-extrabold tracking-[0.28em] text-fg-muted">RENDERWAYS</p>
-            <p className="mt-1.5 flex items-center gap-1.5 text-[14px] font-bold">
-              <MapPin className="size-4 text-brand" />
-              Chennai · Vellore
-            </p>
-          </div>
+        <div className="flex items-center justify-between gap-3">
+          <Logo />
           <div className="flex items-center gap-2">
-            <a
-              href={`tel:${site.primaryPhone}`}
-              aria-label="Call us"
-              className="grid size-9 place-items-center rounded-full border border-line bg-surface-2 text-fg transition-transform active:scale-90"
-            >
-              <Phone className="size-[17px]" />
-            </a>
-            <ThemeToggle className="rounded-full" />
-            <AppMenu />
+            <ThemeToggle className="size-10 rounded-full border-0 bg-white/15" />
+            <AppMenu className="size-10 border-0 bg-white/15" />
           </div>
         </div>
 
-        <h1 className="mt-6 text-[1.65rem] leading-tight font-extrabold tracking-tight">
+        <p className="mt-4 flex items-center gap-1.5 text-[13px] font-bold">
+          <MapPin className="size-4 text-[#FF8FC4]" />
+          Chennai · Vellore
+          <span className="ml-2 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-semibold text-fg-muted">
+            <span className="rw-pulse size-[7px] rounded-full bg-[#34D399]" />
+            24/7 emergency
+          </span>
+        </p>
+
+        <h1 className="mt-2.5 text-[1.45rem] leading-tight font-extrabold tracking-tight">
           {isCustomer ? `Hi ${user.name.split(' ')[0]} 👋` : 'IT support at your doorstep'}
         </h1>
-        <p className="mt-1 text-[13px] text-fg-muted">
-          {isCustomer ? 'What can we fix for you today?' : 'Free diagnosis · 30-day warranty · 24/7 emergency'}
+        <p className="mt-1 text-[12.5px] text-fg-muted">
+          {isCustomer
+            ? 'What can we fix for you today?'
+            : 'Free diagnosis · 30-day warranty · on-site, carry-in or pickup'}
         </p>
       </section>
 
-      {/* Search: filters the services below, or tracks a ticket number */}
-      <form
-        onSubmit={submit}
-        className="relative z-10 mx-4 -mt-7 flex items-center gap-2.5 rounded-2xl border border-line bg-surface pr-2 pl-4 shadow-lg shadow-black/5"
-      >
-        <Search className="size-[18px] shrink-0 text-fg-subtle" />
-        <input
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search laptop repair, CCTV, ticket no…"
-          aria-label="Search services or track a ticket"
-          enterKeyHint="search"
-          className="h-13 min-w-0 flex-1 bg-transparent text-[14.5px] text-fg outline-none placeholder:text-fg-subtle"
-        />
-        {query && (
-          <button
-            type="button"
-            onClick={() => setQuery('')}
-            aria-label="Clear search"
-            className="grid size-8 place-items-center rounded-full text-fg-subtle active:bg-surface-2"
+      <div className="relative z-10 mx-4 -mt-[3.2rem]">
+        {/* Search: filters the services below, or tracks a ticket number */}
+        <form
+          onSubmit={search}
+          className="flex h-[52px] items-center gap-2.5 rounded-[14px] bg-surface pr-2 pl-4 shadow-[0_8px_24px_rgba(36,26,94,0.14)]"
+        >
+          <Search className="size-[18px] shrink-0 text-fg-subtle" />
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search laptop repair, CCTV, ticket no…"
+            aria-label="Search services or track a ticket"
+            enterKeyHint="search"
+            className="h-full min-w-0 flex-1 bg-transparent text-[14.5px] text-fg outline-none placeholder:text-fg-subtle"
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery('')}
+              aria-label="Clear search"
+              className="grid size-8 place-items-center rounded-full text-fg-subtle active:bg-surface-2"
+            >
+              <X className="size-4" />
+            </button>
+          )}
+        </form>
+
+        <div className="stagger mt-[22px] space-y-[26px]">
+          {TICKET_NUMBER.test(term) && (
+            <Link
+              href={`/track?t=${encodeURIComponent(term.toUpperCase())}`}
+              className="flex items-center gap-3 rounded-2xl border border-brand/30 bg-brand-soft p-4 text-brand transition-transform active:scale-[0.98]"
+            >
+              <Search className="size-5 shrink-0" />
+              <span className="flex-1 text-[14px] font-bold">Track ticket {term.toUpperCase()}</span>
+              <ArrowRight className="size-4" />
+            </Link>
+          )}
+
+          {/* Track your repair */}
+          <form
+            onSubmit={track}
+            className="relative isolate overflow-hidden rounded-[20px] bg-linear-135 from-[#241A5E] to-[#4B35A8] p-4 text-white shadow-[0_12px_28px_rgba(36,26,94,0.28)]"
           >
-            <X className="size-4" />
-          </button>
-        )}
-      </form>
-
-      <div className="stagger mx-auto max-w-lg space-y-7 px-4 pt-6">
-        {TICKET_NUMBER.test(term) && (
-          <Link
-            href={`/track?t=${encodeURIComponent(term.toUpperCase())}`}
-            className="flex items-center gap-3 rounded-2xl border border-brand/30 bg-brand-soft p-4 text-brand transition-transform active:scale-[0.98]"
-          >
-            <Search className="size-5 shrink-0" />
-            <span className="flex-1 text-[14px] font-bold">Track ticket {term.toUpperCase()}</span>
-            <ArrowRight className="size-4" />
-          </Link>
-        )}
-
-        {/* Quick actions — the website's Raise / Track buttons and floating Call / WhatsApp */}
-        <section className="grid grid-cols-4 gap-2">
-          {ACTIONS.map((action) => {
-            const content = (
-              <>
-                <span className={`grid size-13 place-items-center rounded-2xl ${action.tone}`}>
-                  <action.icon className="size-6" />
+            <span
+              className="rw-aur3 absolute -top-14 -right-12 -z-10 size-44 rounded-full"
+              style={{ background: 'radial-gradient(circle, rgba(255,176,32,0.3) 0%, rgba(255,176,32,0) 70%)' }}
+              aria-hidden
+            />
+            <div className="flex items-center justify-between gap-3">
+              <span className="flex flex-col gap-0.5">
+                <span className="text-[11px] font-extrabold tracking-[0.08em] text-[#C7D2FE] uppercase">
+                  Track your repair
                 </span>
-                <span className="text-center text-[11.5px] leading-tight font-semibold text-fg">
-                  {action.label}
-                </span>
-              </>
-            );
-            const className = 'flex flex-col items-center gap-1.5 transition-transform active:scale-90';
-            return action.href.startsWith('/') ? (
-              <Link key={action.label} href={action.href} className={className}>
-                {content}
-              </Link>
-            ) : (
-              <a key={action.label} href={action.href} className={className}>
-                {content}
-              </a>
-            );
-          })}
-        </section>
-
-        {/* Categories */}
-        <section>
-          <div className="mb-3 flex items-end justify-between">
-            <h2 className="text-[16px] font-bold tracking-tight text-fg">
-              {searching ? 'Matching services' : 'What do you need today?'}
-            </h2>
-            {!searching && (
-              <Link href="/services" className="text-[13px] font-bold text-brand">
-                See all
-              </Link>
-            )}
-          </div>
-
-          {tiles && tiles.length === 0 ? (
-            <p className="rounded-2xl border border-dashed border-line-strong p-5 text-center text-[13.5px] text-fg-muted">
-              No service matches “{term}”. Try “laptop”, “CCTV” or “data”.
+                <span className="text-[16px] font-extrabold">Where is my ticket?</span>
+              </span>
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white/12">
+                <ShieldCheck className="size-[22px]" />
+              </span>
+            </div>
+            <div className="mt-3 flex gap-2">
+              <label className="flex h-[46px] min-w-0 flex-1 items-center rounded-xl bg-white px-3">
+                <span className="sr-only">Ticket number</span>
+                <input
+                  value={ticketNo}
+                  onChange={(event) => setTicketNo(event.target.value)}
+                  placeholder="RW-2026-0001"
+                  className="w-full min-w-0 bg-transparent text-[14px] font-semibold tracking-[0.03em] text-[#241A5E] uppercase outline-none placeholder:text-[#9A98B5]"
+                />
+              </label>
+              <button
+                type="submit"
+                className="h-[46px] shrink-0 rounded-xl bg-[#FFB020] px-4 text-[14px] font-extrabold text-[#241A5E] transition-transform active:scale-95"
+              >
+                Track
+              </button>
+            </div>
+            <p className="mt-2 text-[11px] leading-snug text-[#C7D2FE]">
+              Your ticket number came by email and WhatsApp when it was raised.
             </p>
-          ) : (
-            <div className="stagger grid grid-cols-3 gap-3">
-              {!tiles
-                ? Array.from({ length: 6 }).map((_, index) => (
-                    <Skeleton key={index} className="h-30 rounded-2xl" />
-                  ))
-                : tiles.map((service) => (
+          </form>
+
+          {/* The customer's numbers */}
+          {isCustomer && (
+            <div className="grid grid-cols-3 gap-2">
+              <Link
+                href="/portal/tickets"
+                className="flex flex-col gap-1 rounded-[14px] bg-surface-2 p-3 transition-transform active:scale-95"
+              >
+                <span className="text-[22px] font-extrabold text-fg">{stats.totalTickets ?? 0}</span>
+                <span className="text-[12px] leading-tight text-fg-muted">Tickets raised</span>
+              </Link>
+              <Link
+                href="/portal/tickets"
+                className="flex flex-col gap-1 rounded-[14px] bg-[#FDEBD8] p-3 transition-transform active:scale-95"
+              >
+                <span className="text-[22px] font-extrabold text-[#9A3412]">{stats.openTickets ?? 0}</span>
+                <span className="text-[12px] leading-tight text-[#5C3A1A]">Open right now</span>
+              </Link>
+              <Link
+                href="/portal/tickets/new"
+                className="flex flex-col gap-1 rounded-[14px] bg-brand-soft p-3 text-brand transition-transform active:scale-95"
+              >
+                <Plus className="size-[26px]" />
+                <span className="text-[12px] leading-tight font-bold">Raise new</span>
+              </Link>
+            </div>
+          )}
+
+          {/* Categories */}
+          <section>
+            <SectionTitle title={searching ? 'Matching services' : 'What needs fixing?'} href={searching ? undefined : '/services'} />
+            {tiles && tiles.length === 0 ? (
+              <p className="rounded-2xl border border-dashed border-line-strong p-5 text-center text-[13.5px] text-fg-muted">
+                No service matches “{term}”. Try “laptop”, “CCTV” or “data”.
+              </p>
+            ) : (
+              <div className="stagger grid grid-cols-3 gap-x-2.5 gap-y-3.5">
+                {!tiles
+                  ? Array.from({ length: 6 }).map((_, index) => (
+                      <Skeleton key={index} className="h-[132px] rounded-2xl" />
+                    ))
+                  : tiles.map((service) => (
+                      <Link
+                        key={service._id}
+                        href={`/services/${service.slug}`}
+                        className="flex flex-col items-center gap-1.5 rounded-2xl border border-line bg-surface px-1.5 pt-3 pb-2.5 text-center shadow-[0_2px_10px_rgba(36,26,94,0.05)] transition-transform active:scale-95"
+                      >
+                        <ArtTile kind={artForService(service)} size={60} />
+                        <span className="line-clamp-2 text-[12.5px] leading-tight font-extrabold text-fg">
+                          {service.title}
+                        </span>
+                        <span className="mt-auto text-[10.5px] text-fg-muted">
+                          From {formatCurrency(service.startingPrice)}
+                        </span>
+                      </Link>
+                    ))}
+              </div>
+            )}
+          </section>
+
+          {/* More support */}
+          <section>
+            <SectionTitle title="More support" />
+            <div className="grid grid-cols-3 gap-2.5">
+              {SUPPORT.map((item) => {
+                const className =
+                  'flex flex-col gap-2 rounded-2xl p-3 text-left transition-transform active:scale-95';
+                const body = (
+                  <>
+                    <span
+                      className="grid size-9 place-items-center rounded-[10px] text-white"
+                      style={{ background: item.chip }}
+                    >
+                      <item.icon className="size-5" />
+                    </span>
+                    <span className="text-[13px] leading-tight font-extrabold text-[#241A5E]">{item.label}</span>
+                    <span className="text-[11px] leading-snug" style={{ color: item.ink }}>
+                      {item.sub}
+                    </span>
+                  </>
+                );
+                return item.href.startsWith('/') ? (
+                  <Link key={item.label} href={item.href} className={className} style={{ background: item.bg }}>
+                    {body}
+                  </Link>
+                ) : (
+                  <a key={item.label} href={item.href} className={className} style={{ background: item.bg }}>
+                    {body}
+                  </a>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Shop */}
+          {products.length > 0 && (
+            <section>
+              <SectionTitle title="Shop · computers & accessories" href="/products" />
+              <div className="stagger scrollbar-none -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
+                {products.map((product) => {
+                  const kind = artForProduct(product);
+                  return (
+                    <Link
+                      key={product._id}
+                      href="/products"
+                      className="flex w-[132px] shrink-0 flex-col gap-1.5 transition-transform active:scale-[0.97]"
+                    >
+                      <span
+                        className="grid h-[100px] w-[132px] place-items-center rounded-[14px]"
+                        style={{ background: ART_TINTS[kind] }}
+                      >
+                        <ServiceArt kind={kind} size={84} />
+                      </span>
+                      <span className="line-clamp-2 text-[13px] leading-snug font-bold text-fg">{product.name}</span>
+                      <span className="text-[12px] font-extrabold text-fg">
+                        {product.price > 0
+                          ? formatCurrency(product.price)
+                          : product.rentalPricePerDay > 0
+                            ? `${formatCurrency(product.rentalPricePerDay)} / day`
+                            : 'Ask for price'}
+                        {product.mrp > product.price && product.price > 0 && (
+                          <s className="ml-1 text-[11px] font-medium text-fg-subtle">{formatCurrency(product.mrp)}</s>
+                        )}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* Offer */}
+          <Link
+            href={amc ? `/services/${amc.slug}` : '/portal/tickets/new'}
+            className="relative isolate block overflow-hidden rounded-[20px] bg-linear-135 from-[#E2187D] to-[#B5125F] p-5 text-white shadow-[0_10px_26px_rgba(226,24,125,0.28)] transition-transform active:scale-[0.98]"
+          >
+            <span className="absolute -right-10 -bottom-20 -z-10 size-48 rounded-full bg-white/12" aria-hidden />
+            <span className="absolute -top-12 right-16 -z-10 size-24 rounded-full bg-white/10" aria-hidden />
+            <p className="text-[20px] leading-tight font-extrabold">
+              {amc ? `Annual AMC from ${formatCurrency(amc.startingPrice)}` : 'Free diagnosis on every repair'}
+            </p>
+            <p className="mt-1.5 text-[14px] leading-snug text-[#FFE1EF]">
+              {amc
+                ? [amc.priceNote, amc.turnaround].filter(Boolean).join(' · ')
+                : 'Know exactly what failed before you pay a rupee'}
+            </p>
+            <span className="mt-3.5 inline-flex h-10 items-center rounded-[10px] bg-white px-4 text-[13px] font-extrabold text-[#B5125F]">
+              {amc ? 'View plans' : 'Raise a ticket'}
+            </span>
+          </Link>
+
+          {/* Most booked */}
+          {popular.length > 0 && (
+            <section>
+              <SectionTitle title="Most booked services" href="/services" />
+              <div className="stagger scrollbar-none -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
+                {popular.map((service) => {
+                  const kind = artForService(service);
+                  return (
                     <Link
                       key={service._id}
                       href={`/services/${service.slug}`}
-                      className="flex flex-col items-center rounded-2xl border border-line bg-surface px-2 pt-4 pb-3 text-center shadow-sm shadow-black/[0.03] transition-transform active:scale-95"
+                      className="flex w-[148px] shrink-0 flex-col gap-2 transition-transform active:scale-[0.97]"
                     >
-                      <span className="grid size-12 place-items-center rounded-full bg-accent-soft text-accent">
-                        <Icon name={service.icon} className="size-[22px]" />
+                      <span
+                        className="grid h-[112px] w-[148px] place-items-center rounded-[14px]"
+                        style={{ background: ART_TINTS[kind] }}
+                      >
+                        <ServiceArt kind={kind} size={92} />
                       </span>
-                      <span className="mt-2.5 line-clamp-2 text-[12.5px] leading-tight font-bold text-fg">
-                        {service.title}
-                      </span>
-                      <span className="mt-auto pt-1 text-[10.5px] text-fg-subtle">
-                        From {formatCurrency(service.startingPrice)}
+                      <span className="line-clamp-1 text-[14px] font-bold text-fg">{service.title}</span>
+                      <span className="-mt-1 text-[13px] text-fg-muted">
+                        Starts at {formatCurrency(service.startingPrice)}
                       </span>
                     </Link>
-                  ))}
-            </div>
+                  );
+                })}
+              </div>
+            </section>
           )}
-        </section>
 
-        {/* The customer's own tickets */}
-        {isCustomer && (
-          <section>
-            <div className="mb-3 flex items-end justify-between">
-              <h2 className="text-[16px] font-bold tracking-tight text-fg">Your tickets</h2>
-              <Link href="/portal/tickets" className="text-[13px] font-bold text-brand">
-                View all
-              </Link>
-            </div>
-            {!recent ? (
-              <Skeleton className="h-28 rounded-2xl" />
-            ) : recent.tickets.length === 0 ? (
-              <div className="rounded-2xl border border-line bg-surface p-5 text-center">
-                <p className="text-[14px] font-bold text-fg">No tickets yet</p>
-                <p className="mt-1 text-[13px] text-fg-muted">Raise one and follow every step here.</p>
-                <Button href="/portal/tickets/new" size="sm" className="mt-4 rounded-full px-5">
-                  Raise a ticket
+          {/* The customer's own tickets */}
+          {isCustomer && (
+            <section>
+              <SectionTitle title="Your tickets" href="/portal/tickets" action="View all" />
+              {!recent ? (
+                <Skeleton className="h-28 rounded-2xl" />
+              ) : recent.tickets.length === 0 ? (
+                <div className="rounded-[20px] border border-line bg-surface p-5 text-center">
+                  <p className="text-[15px] font-extrabold text-fg">No tickets yet</p>
+                  <p className="mt-1 text-[13px] text-fg-muted">Pick a service and get an engineer in under a minute.</p>
+                  <Button href="/portal/tickets/new" size="sm" className="mt-4 rounded-xl bg-accent px-5">
+                    Raise a ticket
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {recent.tickets.map((ticket) => (
+                    <TicketCard key={ticket._id} ticket={ticket} basePath="/portal/tickets" />
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
+
+          {!user && (
+            <section className="rounded-[20px] border border-line bg-surface p-[18px]">
+              <h2 className="text-[16px] leading-tight font-extrabold text-fg">Your tickets, in your pocket</h2>
+              <p className="mt-1.5 text-[13px] leading-relaxed text-fg-muted">
+                Sign in with your mobile number to raise tickets, follow every step and keep every invoice in one place.
+              </p>
+              <div className="mt-4 grid grid-cols-2 gap-2.5">
+                <Button href="/login" className="rounded-xl bg-accent">
+                  Sign in
+                </Button>
+                <Button href="/register" variant="secondary" className="rounded-xl">
+                  Create account
                 </Button>
               </div>
-            ) : (
-              <div className="space-y-3">
-                {recent.tickets.map((ticket) => (
-                  <TicketCard key={ticket._id} ticket={ticket} basePath="/portal/tickets" />
-                ))}
-              </div>
-            )}
-          </section>
-        )}
+            </section>
+          )}
 
-        {/* Offer */}
-        <Link
-          href={amc ? `/services/${amc.slug}` : '/portal/tickets/new'}
-          className="relative isolate block overflow-hidden rounded-3xl bg-linear-135 from-brand to-brand-strong p-5 text-white shadow-lg shadow-brand/25 transition-transform active:scale-[0.98]"
-        >
-          <span className="absolute -right-10 -bottom-20 -z-10 size-48 rounded-full bg-white/12" aria-hidden />
-          <span className="absolute -top-12 right-16 -z-10 size-24 rounded-full bg-white/10" aria-hidden />
-          <p className="text-[18px] leading-tight font-extrabold">
-            {amc ? `Annual AMC from ${formatCurrency(amc.startingPrice)}` : 'Free diagnosis on every repair'}
-          </p>
-          <p className="mt-1 text-[12.5px] text-white/80">
-            {amc
-              ? [amc.priceNote, amc.turnaround].filter(Boolean).join(' · ')
-              : 'Know exactly what failed before you pay a rupee'}
-          </p>
-          <span className="mt-4 inline-flex rounded-full bg-white px-4 py-1.5 text-[12.5px] font-bold text-brand">
-            {amc ? 'View plans' : 'Raise a ticket'}
-          </span>
-        </Link>
-
-        {/* Popular */}
-        {popular.length > 0 && (
+          {/* More */}
           <section>
-            <h2 className="mb-3 text-[16px] font-bold tracking-tight text-fg">Popular services</h2>
-            <div className="stagger scrollbar-none -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1">
-              {popular.map((service) => (
-                <Link
-                  key={service._id}
-                  href={`/services/${service.slug}`}
-                  className="w-[46%] shrink-0 snap-start overflow-hidden rounded-2xl border border-line bg-surface transition-transform active:scale-[0.97]"
-                >
-                  <span className="flex h-16 items-center bg-accent-soft px-4 text-accent">
-                    <Icon name={service.icon} className="size-6" />
-                  </span>
-                  <span className="block px-3.5 pt-3 pb-3.5">
-                    <span className="line-clamp-1 text-[13.5px] font-bold text-fg">{service.title}</span>
-                    <span className="mt-0.5 block truncate text-[12px] font-bold text-brand">
-                      {formatCurrency(service.startingPrice)}{' '}
-                      <span className="font-medium">{service.priceNote}</span>
-                    </span>
-                  </span>
-                </Link>
+            <SectionTitle title="More" />
+            <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
+              {APP_MORE_LINKS.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="flex items-center gap-3 px-4 py-3.5 text-[14.5px] font-semibold text-fg transition-colors active:bg-surface-2"
+                  >
+                    <item.icon className="size-[18px] text-accent" />
+                    <span className="flex-1">{item.label}</span>
+                    <ChevronRight className="size-4 text-fg-subtle" />
+                  </Link>
+                </li>
               ))}
-            </div>
+            </ul>
           </section>
-        )}
 
-        {!user && (
-          <section className="rounded-3xl border border-line bg-surface p-5">
-            <h2 className="text-[16px] font-bold text-fg">Your tickets, in your pocket</h2>
-            <p className="mt-1 text-[13.5px] leading-relaxed text-fg-muted">
-              Sign in to raise tickets, follow your technician live and keep every invoice in one place.
-            </p>
-            <div className="mt-4 grid grid-cols-2 gap-2.5">
-              <Button href="/login" className="rounded-2xl">
-                Sign in
-              </Button>
-              <Button href="/register" variant="secondary" className="rounded-2xl">
-                Create account
-              </Button>
-            </div>
-          </section>
-        )}
-
-        {/* More */}
-        <section>
-          <h2 className="mb-3 text-[16px] font-bold tracking-tight text-fg">More</h2>
-          <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
-            {APP_MORE_LINKS.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="flex items-center gap-3 px-4 py-3.5 text-[14.5px] font-semibold text-fg transition-colors active:bg-surface-2"
-                >
-                  <item.icon className="size-[18px] text-accent" />
-                  <span className="flex-1">{item.label}</span>
-                  <ChevronRight className="size-4 text-fg-subtle" />
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <p className="text-center text-[12px] leading-relaxed text-fg-subtle">
-          {site.hours}
-          <br />
-          {site.emergency} · {site.phones[0]}
-        </p>
+          <p className="text-center text-[12px] leading-relaxed text-fg-subtle">
+            {site.hours}
+            <br />
+            {site.emergency} · {site.phones[0]}
+          </p>
+        </div>
       </div>
     </div>
   );

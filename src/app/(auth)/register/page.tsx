@@ -160,7 +160,12 @@ export default function RegisterPage() {
           />
         </div>
 
-        <Button type="submit" size="lg" loading={loading} className="mt-2 w-full">
+        <Button
+          type="submit"
+          size="lg"
+          loading={loading}
+          className="mt-2 w-full app:bg-linear-90 app:from-accent app:to-brand app:shadow-[0_10px_24px_rgba(75,53,168,0.35)]"
+        >
           Create account
           <ArrowRight className="size-4" />
         </Button>

@@ -3,6 +3,7 @@ import { ArrowLeft, BadgeCheck, Clock, Headset } from 'lucide-react';
 import { site } from '@/lib/site';
 import { Logo } from '@/components/layout/logo';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
+import { AppAuthHero } from '@/components/auth/app-auth-hero';
 
 const HIGHLIGHTS = [
   { icon: Clock, title: 'Live ticket tracking', body: 'Watch every step from raise to sign-off.' },
@@ -12,7 +13,7 @@ const HIGHLIGHTS = [
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid min-h-dvh lg:grid-cols-2">
+    <div className="grid min-h-dvh lg:grid-cols-2 app:bg-[#1A1250]">
       {/* Brand panel */}
       <aside className="relative hidden overflow-hidden border-r border-line bg-bg-subtle p-12 lg:flex lg:flex-col lg:justify-between">
         <div className="aurora" aria-hidden />
@@ -54,14 +55,15 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       {/* Form panel */}
       <main className="relative flex flex-col">
-        <div className="app-hero flex items-center justify-between p-5 sm:p-6 app:pt-[calc(var(--safe-top)+0.75rem)] app:pb-3">
+        {/* In the app: an animated scene instead of the website's top bar. */}
+        <AppAuthHero />
+        <div className="flex items-center justify-between p-5 sm:p-6 app:hidden">
           <Link
             href="/"
             className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-fg-muted transition-colors hover:text-brand"
           >
             <ArrowLeft className="size-4" />
-            <span className="app:hidden">Back to website</span>
-            <span className="hidden app:inline">Back</span>
+            Back to website
           </Link>
           <div className="flex items-center gap-3">
             <span className="lg:hidden">
@@ -71,8 +73,18 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </div>
         </div>
 
-        <div className="flex flex-1 items-center justify-center p-5 pb-14 sm:p-6">
-          <div className="w-full max-w-md">{children}</div>
+        <div className="flex flex-1 items-center justify-center p-5 pb-14 sm:p-6 app:items-start app:px-3 app:pt-0 app:pb-[calc(var(--safe-bottom)+0.75rem)]">
+          <div className="w-full max-w-md app:max-w-lg app:rounded-3xl app:bg-surface app:p-5 app:shadow-[0_-10px_40px_rgba(0,0,0,0.35)]">
+            {children}
+            <ul className="mt-6 hidden flex-wrap justify-center gap-x-4 gap-y-1.5 app:flex">
+              {HIGHLIGHTS.map((item) => (
+                <li key={item.title} className="flex items-center gap-1.5 text-[11px] font-bold text-fg-muted">
+                  <item.icon className="size-3.5 text-accent" />
+                  {item.title}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </main>
     </div>

@@ -114,14 +114,14 @@ html.app {
   --brand-soft: #fde8f2;
   --brand-fg: #ffffff;
 
-  --accent: #4a2a9d;
+  --accent: #4b35a8;
   --accent-soft: #ece8fa;
 
   --ring: #e0177b;
   --glow-1: rgba(224, 23, 123, 0.12);
   --glow-2: rgba(74, 42, 157, 0.12);
 
-  --hero: #41249a;
+  --hero: #4b35a8;
 }
 
 html.app.dark {
@@ -449,6 +449,16 @@ html.app .app-hero .text-gradient {
   .stagger > :nth-child(8) { animation-delay: 315ms; }
   .stagger > :nth-child(n + 9) { animation-delay: 360ms; }
 
+  /* App motion (from the app design prototype): drifting aurora blobs, floating
+     illustrations and live dots. Reduced-motion users get them still. */
+  .rw-aur1 { animation: rw-aurora 11s ease-in-out infinite; }
+  .rw-aur2 { animation: rw-aurora 13s ease-in-out infinite reverse; }
+  .rw-aur3 { animation: rw-aurora 15s ease-in-out 2s infinite; }
+  .rw-f1 { animation: rw-float 4s ease-in-out infinite; }
+  .rw-f2 { animation: rw-float 5s ease-in-out 0.6s infinite; }
+  .rw-f3 { animation: rw-float 4.6s ease-in-out 1.2s infinite; }
+  .rw-pulse { animation: rw-pulse 1.6s ease-in-out infinite; }
+
   .scrollbar-none {
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -504,6 +514,36 @@ html.app .app-hero .text-gradient {
   from {
     opacity: 0;
     transform: translateY(16px) scale(0.98);
+  }
+}
+
+@keyframes rw-aurora {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(28px, 22px) scale(1.12);
+  }
+}
+
+@keyframes rw-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes rw-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
   }
 }
 
