@@ -4,12 +4,13 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, LayoutDashboard, LogOut, Menu, Phone, Ticket, User, X } from 'lucide-react';
+import { ChevronDown, LayoutDashboard, Laptop, LogOut, Menu, Package, Phone, Ticket, User, X } from 'lucide-react';
 import { site, whatsappLink } from '@/lib/site';
 import { cn } from '@/lib/utils';
 import { useAuth, homeFor } from '@/components/providers/auth-provider';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/misc';
+import { CartButton } from '@/components/shop/shop-buttons';
 import { Logo } from './logo';
 import { ThemeToggle } from './theme-toggle';
 
@@ -112,6 +113,7 @@ export function Navbar() {
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
+            <CartButton />
 
             {loading ? (
               <div className="hidden h-9 w-28 animate-pulse rounded-lg bg-surface-2 sm:block" />
@@ -166,6 +168,33 @@ export function Navbar() {
                             >
                               <Ticket className="size-4" />
                               My tickets
+                            </Link>
+                          )}
+                          {user.role === 'customer' && (
+                            <Link
+                              href="/portal/devices"
+                              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-fg-muted transition-colors hover:bg-surface-2 hover:text-fg"
+                            >
+                              <Laptop className="size-4" />
+                              My devices
+                            </Link>
+                          )}
+                          {user.role === 'customer' && (
+                            <Link
+                              href="/portal/orders"
+                              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-fg-muted transition-colors hover:bg-surface-2 hover:text-fg"
+                            >
+                              <Package className="size-4" />
+                              My orders
+                            </Link>
+                          )}
+                          {user.role === 'admin' && (
+                            <Link
+                              href="/admin/orders"
+                              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-fg-muted transition-colors hover:bg-surface-2 hover:text-fg"
+                            >
+                              <Package className="size-4" />
+                              Shop orders
                             </Link>
                           )}
                           <Link

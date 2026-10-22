@@ -29,6 +29,7 @@ import { cn } from '@/lib/utils';
 import { homeFor, useAuth } from '@/components/providers/auth-provider';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/misc';
+import { APP_CUSTOMER_LINKS } from './app-links';
 import { Logo } from './logo';
 
 // The website's menu, one icon each.
@@ -67,9 +68,8 @@ export function AppMenu({ className }: { className?: string }) {
   const accountLinks = user
     ? [
         { label: 'My dashboard', href: home!, icon: LayoutDashboard },
-        ...(user.role === 'customer'
-          ? [{ label: 'My tickets', href: '/portal/tickets', icon: Ticket }]
-          : []),
+        ...(user.role === 'customer' ? APP_CUSTOMER_LINKS : []),
+        ...(user.role === 'admin' ? [{ label: 'Shop orders', href: '/admin/orders', icon: Package }] : []),
         { label: 'My profile', href: `${home}/profile`, icon: UserRound },
       ]
     : [];

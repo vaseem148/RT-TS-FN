@@ -139,6 +139,25 @@ export default function PortalOverview() {
         </div>
 
         <div className="flex flex-col gap-5">
+          <div className="grid grid-cols-3 gap-2.5">
+            {[
+              { label: 'My devices', href: '/portal/devices', icon: 'Laptop' },
+              { label: 'My orders', href: '/portal/orders', icon: 'Package' },
+              { label: 'Shop', href: '/products', icon: 'ShoppingBag' },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="group flex flex-col items-center gap-2 rounded-2xl border border-line bg-surface p-3.5 text-center transition-all hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-lg hover:shadow-brand/8 active:scale-95"
+              >
+                <span className="grid size-10 place-items-center rounded-xl bg-linear-135 from-brand/12 to-accent/12 text-brand">
+                  <Icon name={item.icon} className="size-5" />
+                </span>
+                <span className="text-[12.5px] font-bold text-fg group-hover:text-brand">{item.label}</span>
+              </Link>
+            ))}
+          </div>
+
           <Card className="p-5">
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 text-brand" />

@@ -5,6 +5,7 @@ import { ChevronLeft } from 'lucide-react';
 import { useAuth } from '@/components/providers/auth-provider';
 import { useIsApp } from '@/lib/app-mode';
 import { tabsFor } from '@/lib/bottom-tabs';
+import { CartButton } from '@/components/shop/shop-buttons';
 import { AppMenu } from './app-menu';
 import { ThemeToggle } from './theme-toggle';
 
@@ -12,7 +13,8 @@ import { ThemeToggle } from './theme-toggle';
 const TITLES: [prefix: string, title: string][] = [
   ['/services/', ''],
   ['/services', 'Services'],
-  ['/products', 'Products'],
+  ['/products', 'Shop'],
+  ['/cart', 'Your cart'],
   ['/track', 'Track ticket'],
   ['/about', 'About us'],
   ['/contact', 'Contact'],
@@ -65,6 +67,7 @@ export function AppTopBar() {
           {title}
         </p>
 
+        {(pathname.startsWith('/products') || pathname === '/cart') && <CartButton className="rounded-full" />}
         <ThemeToggle className="rounded-full" />
         <AppMenu className="ml-1" />
       </div>

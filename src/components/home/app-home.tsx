@@ -6,20 +6,25 @@ import { useRouter } from 'next/navigation';
 import {
   ArrowRight,
   ChevronRight,
+  Laptop,
   MapPin,
   MessageCircle,
   Phone,
   Plus,
   Search,
   ShieldCheck,
+  ShoppingBag,
   Ticket,
+  Truck,
+  Wrench,
   X,
 } from 'lucide-react';
 import { site, whatsappLink } from '@/lib/site';
-import { productApi, serviceApi, ticketApi } from '@/lib/endpoints';
+import { deviceApi, orderApi, productApi, serviceApi, ticketApi } from '@/lib/endpoints';
 import { useApi } from '@/lib/use-api';
 import { useIsApp } from '@/lib/app-mode';
 import { formatCurrency } from '@/lib/utils';
+import { deviceMeta, deviceTitle } from '@/lib/device-meta';
 import { homeFor, useAuth } from '@/components/providers/auth-provider';
 import { ART_TINTS, ArtTile, ServiceArt, artForProduct, artForService } from '@/components/app/service-art';
 import { APP_MORE_LINKS } from '@/components/layout/app-links';
@@ -27,6 +32,8 @@ import { AppMenu } from '@/components/layout/app-menu';
 import { Logo } from '@/components/layout/logo';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { TicketCard } from '@/components/tickets/ticket-list';
+import { AddToCart, CartButton } from '@/components/shop/shop-buttons';
+import { OrderStatusBadge } from '@/components/shop/order-ui';
 import { Button } from '@/components/ui/button';
 import { Skeleton, Spinner } from '@/components/ui/misc';
 
@@ -60,6 +67,41 @@ const SUPPORT = [
     bg: '#DDF4E8',
     chip: '#1F7A4D',
     ink: '#14532D',
+  },
+];
+
+// The three things people come for, big at the top: get something fixed,
+// book a service, or buy.
+const QUICK = [
+  {
+    label: 'Repair',
+    sub: 'Fix it at your door',
+    href: '/portal/tickets/new',
+    icon: Wrench,
+    from: '#E2187D',
+    to: '#B5125F',
+    glow: 'rgba(226,24,125,0.32)',
+    float: 'rw-f1',
+  },
+  {
+    label: 'Service',
+    sub: 'All services',
+    href: '/services',
+    icon: ShieldCheck,
+    from: '#6D4BE0',
+    to: '#4B35A8',
+    glow: 'rgba(75,53,168,0.32)',
+    float: 'rw-f2',
+  },
+  {
+    label: 'Sales',
+    sub: 'Buy computers',
+    href: '/products',
+    icon: ShoppingBag,
+    from: '#FFB020',
+    to: '#F08A00',
+    glow: 'rgba(240,138,0,0.32)',
+    float: 'rw-f3',
   },
 ];
 
@@ -97,6 +139,10 @@ export function AppHome() {
   const { data: recent } = useApi(isApp && isCustomer ? 'tickets:app-home' : null, () =>
     ticketApi.list({ limit: 3, sort: '-createdAt' })
   );
+  const { data: devices } = useApi(isApp && isCustomer ? 'devices:list:' : null, () => deviceApi.list());
+  const { data: activeOrders } = useApi(isApp && isCustomer ? 'orders:app-home' : null, () =>
+    orderApi.list({ status: 'active', limit: 2 })
+  );
 
   useEffect(() => {
     if (isApp && user && user.role !== 'customer') router.replace(homeFor(user.role));
@@ -132,7 +178,7 @@ export function AppHome() {
   }
 
   const searching = term.length > 0;
-  const tiles = searching ? matches : matches?.slice(0, 6);
+  const tiles = matches;
   const amc = services?.find((service) => service.ticketCategory === 'amc');
   const popular = services?.filter((service) => service.isFeatured) ?? [];
   const products = shop?.products ?? [];
@@ -155,6 +201,7 @@ export function AppHome() {
         <div className="flex items-center justify-between gap-3">
           <Logo />
           <div className="flex items-center gap-2">
+            <CartButton className="size-10 rounded-full border-0 bg-white/15 text-fg" />
             <ThemeToggle className="size-10 rounded-full border-0 bg-white/15" />
             <AppMenu className="size-10 border-0 bg-white/15" />
           </div>
@@ -205,6 +252,30 @@ export function AppHome() {
             </button>
           )}
         </form>
+
+        {/* Repair · Service · Sales */}
+        {!searching && (
+          <div className="stagger mt-4 grid grid-cols-3 gap-2.5">
+            {QUICK.map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className="relative isolate flex flex-col gap-2 overflow-hidden rounded-[18px] p-3 text-white transition-transform active:scale-95"
+                style={{
+                  background: `linear-gradient(135deg, ${item.from}, ${item.to})`,
+                  boxShadow: `0 10px 22px ${item.glow}`,
+                }}
+              >
+                <span className="absolute -right-6 -bottom-8 -z-10 size-20 rounded-full bg-white/14" aria-hidden />
+                <span className={`grid size-10 place-items-center rounded-xl bg-white/20 ${item.float}`}>
+                  <item.icon className="size-[22px]" />
+                </span>
+                <span className="text-[16px] leading-none font-extrabold">{item.label}</span>
+                <span className="-mt-1 text-[11px] leading-tight text-white/85">{item.sub}</span>
+              </Link>
+            ))}
+          </div>
+        )}
 
         <div className="stagger mt-[22px] space-y-[26px]">
           {TICKET_NUMBER.test(term) && (
@@ -288,9 +359,95 @@ export function AppHome() {
             </div>
           )}
 
+          {/* Orders on their way */}
+          {isCustomer &&
+            activeOrders?.orders.map((order) => (
+              <Link
+                key={order._id}
+                href={`/portal/orders/${order._id}`}
+                className="flex items-center gap-3 rounded-2xl border border-line bg-surface p-3.5 shadow-[0_2px_10px_rgba(36,26,94,0.05)] transition-transform active:scale-[0.98]"
+              >
+                <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-[#FFF1C7] text-[#9A5B00]">
+                  <Truck className="size-[22px]" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-center gap-2">
+                    <span className="font-mono text-[11.5px] font-bold text-fg-subtle">{order.orderNumber}</span>
+                    <OrderStatusBadge status={order.status} />
+                  </span>
+                  <span className="mt-0.5 block truncate text-[14px] font-bold text-fg">
+                    {order.items[0]?.name}
+                    {order.items.length > 1 ? ` + ${order.items.length - 1} more` : ''}
+                  </span>
+                </span>
+                <ChevronRight className="size-4 shrink-0 text-fg-subtle" />
+              </Link>
+            ))}
+
+          {/* The customer's devices: one tap to book a repair */}
+          {isCustomer && devices && (
+            <section>
+              <SectionTitle title="My devices" href="/portal/devices" action="Manage" />
+              {devices.length === 0 ? (
+                <Link
+                  href="/portal/devices/new"
+                  className="flex items-center gap-3.5 rounded-[20px] border border-dashed border-brand/40 bg-brand-soft p-4 transition-transform active:scale-[0.98]"
+                >
+                  <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-brand text-white">
+                    <Laptop className="size-6" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[15px] font-extrabold text-fg">Add your devices</span>
+                    <span className="block text-[12.5px] leading-snug text-fg-muted">
+                      Book repairs in one tap and see every visit for each one.
+                    </span>
+                  </span>
+                  <Plus className="size-5 text-brand" />
+                </Link>
+              ) : (
+                <div className="stagger scrollbar-none -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
+                  {devices.map((device) => (
+                    <div
+                      key={device._id}
+                      className="flex w-[156px] shrink-0 flex-col rounded-2xl border border-line bg-surface p-3 shadow-[0_2px_10px_rgba(36,26,94,0.05)]"
+                    >
+                      <Link href={`/portal/devices/${device._id}`} className="flex flex-col gap-1.5 active:scale-[0.97]">
+                        <ArtTile kind={deviceMeta(device.type).art} size={52} />
+                        <span className="truncate text-[13.5px] font-extrabold text-fg">{deviceTitle(device)}</span>
+                        <span className="-mt-1 text-[11.5px] text-fg-muted">
+                          {device.openTickets
+                            ? `${device.openTickets} open ticket${device.openTickets > 1 ? 's' : ''}`
+                            : `${device.ticketCount ?? 0} visit${device.ticketCount === 1 ? '' : 's'}`}
+                        </span>
+                      </Link>
+                      <Link
+                        href={`/portal/tickets/new?device=${device._id}`}
+                        className="mt-2.5 inline-flex h-8 items-center justify-center gap-1 rounded-lg bg-brand-soft text-[12px] font-bold text-brand transition-transform active:scale-95"
+                      >
+                        <Wrench className="size-3.5" />
+                        Book repair
+                      </Link>
+                    </div>
+                  ))}
+                  <Link
+                    href="/portal/devices/new"
+                    className="flex w-[120px] shrink-0 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-line-strong text-fg-muted transition-transform active:scale-95"
+                  >
+                    <Plus className="size-6" />
+                    <span className="text-[12.5px] font-bold">Add device</span>
+                  </Link>
+                </div>
+              )}
+            </section>
+          )}
+
           {/* Categories */}
           <section>
-            <SectionTitle title={searching ? 'Matching services' : 'What needs fixing?'} href={searching ? undefined : '/services'} />
+            <SectionTitle
+              title={searching ? 'Matching services' : 'All services'}
+              href={searching ? undefined : '/services'}
+              action="Details"
+            />
             {tiles && tiles.length === 0 ? (
               <p className="rounded-2xl border border-dashed border-line-strong p-5 text-center text-[13.5px] text-fg-muted">
                 No service matches “{term}”. Try “laptop”, “CCTV” or “data”.
@@ -298,7 +455,7 @@ export function AppHome() {
             ) : (
               <div className="stagger grid grid-cols-3 gap-x-2.5 gap-y-3.5">
                 {!tiles
-                  ? Array.from({ length: 6 }).map((_, index) => (
+                  ? Array.from({ length: 9 }).map((_, index) => (
                       <Skeleton key={index} className="h-[132px] rounded-2xl" />
                     ))
                   : tiles.map((service) => (
@@ -357,34 +514,33 @@ export function AppHome() {
           {/* Shop */}
           {products.length > 0 && (
             <section>
-              <SectionTitle title="Shop · computers & accessories" href="/products" />
+              <SectionTitle title="Sales · computers & accessories" href="/products" action="Shop all" />
               <div className="stagger scrollbar-none -mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
                 {products.map((product) => {
                   const kind = artForProduct(product);
                   return (
-                    <Link
-                      key={product._id}
-                      href="/products"
-                      className="flex w-[132px] shrink-0 flex-col gap-1.5 transition-transform active:scale-[0.97]"
-                    >
-                      <span
-                        className="grid h-[100px] w-[132px] place-items-center rounded-[14px]"
-                        style={{ background: ART_TINTS[kind] }}
-                      >
-                        <ServiceArt kind={kind} size={84} />
-                      </span>
-                      <span className="line-clamp-2 text-[13px] leading-snug font-bold text-fg">{product.name}</span>
-                      <span className="text-[12px] font-extrabold text-fg">
-                        {product.price > 0
-                          ? formatCurrency(product.price)
-                          : product.rentalPricePerDay > 0
-                            ? `${formatCurrency(product.rentalPricePerDay)} / day`
-                            : 'Ask for price'}
-                        {product.mrp > product.price && product.price > 0 && (
-                          <s className="ml-1 text-[11px] font-medium text-fg-subtle">{formatCurrency(product.mrp)}</s>
-                        )}
-                      </span>
-                    </Link>
+                    <div key={product._id} className="flex w-[132px] shrink-0 flex-col gap-1.5">
+                      <Link href="/products" className="flex flex-col gap-1.5 transition-transform active:scale-[0.97]">
+                        <span
+                          className="grid h-[100px] w-[132px] place-items-center rounded-[14px]"
+                          style={{ background: ART_TINTS[kind] }}
+                        >
+                          <ServiceArt kind={kind} size={84} />
+                        </span>
+                        <span className="line-clamp-2 text-[13px] leading-snug font-bold text-fg">{product.name}</span>
+                        <span className="text-[12px] font-extrabold text-fg">
+                          {product.price > 0
+                            ? formatCurrency(product.price)
+                            : product.rentalPricePerDay > 0
+                              ? `${formatCurrency(product.rentalPricePerDay)} / day`
+                              : 'Ask for price'}
+                          {product.mrp > product.price && product.price > 0 && (
+                            <s className="ml-1 text-[11px] font-medium text-fg-subtle">{formatCurrency(product.mrp)}</s>
+                          )}
+                        </span>
+                      </Link>
+                      <AddToCart product={product} size="sm" className="mt-auto w-full" />
+                    </div>
                   );
                 })}
               </div>

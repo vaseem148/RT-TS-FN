@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -13,12 +13,14 @@ import {
   Send,
   X,
 } from 'lucide-react';
-import { ticketApi } from '@/lib/endpoints';
+import { deviceApi, ticketApi } from '@/lib/endpoints';
 import { toApiError } from '@/lib/api';
-import { invalidate } from '@/lib/use-api';
+import { invalidate, useApi } from '@/lib/use-api';
 import { cn, titleCase } from '@/lib/utils';
 import { CATEGORY_ICON, PRIORITY_META, SERVICE_MODE_LABEL } from '@/lib/ticket-meta';
-import type { TicketPriority } from '@/lib/types';
+import type { Device, TicketPriority } from '@/lib/types';
+import { deviceMeta, deviceTitle } from '@/lib/device-meta';
+import { ArtTile } from '@/components/app/service-art';
 import { useAuth } from '@/components/providers/auth-provider';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -60,6 +62,8 @@ function NewTicketForm() {
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [files, setFiles] = useState<File[]>([]);
+  /** A saved device this ticket is for; its tickets build its service history. */
+  const [deviceId, setDeviceId] = useState('');
 
   const [form, setForm] = useState({
     subject: '',
@@ -98,6 +102,33 @@ function NewTicketForm() {
           : prev.description,
     }));
   }, [searchParams]);
+
+  const { data: devices } = useApi(user?.role === 'customer' ? 'devices:list:' : null, () => deviceApi.list());
+
+  const pickDevice = (device: Device | null) => {
+    setDeviceId(device?._id ?? '');
+    setForm((prev) => ({
+      ...prev,
+      deviceType: device ? deviceMeta(device.type).label : '',
+      deviceBrand: device?.brand ?? '',
+      deviceModel: device?.model ?? '',
+      serialNumber: device?.serialNumber ?? '',
+      category: prev.category || (device ? deviceMeta(device.type).category : ''),
+    }));
+  };
+
+  // "Book repair" on a device opens this form with ?device=<id>.
+  // Applied once, so a background refresh of the list doesn't undo edits.
+  const deviceParam = searchParams.get('device');
+  const appliedDevice = useRef('');
+  useEffect(() => {
+    const device = deviceParam && devices?.find((entry) => entry._id === deviceParam);
+    if (!device || appliedDevice.current === device._id) return;
+    appliedDevice.current = device._id;
+    pickDevice(device);
+  }, [deviceParam, devices]);
+
+  const picked = devices?.find((device) => device._id === deviceId);
 
   // Default the service address to whatever is saved on the profile.
   useEffect(() => {
@@ -151,6 +182,7 @@ function NewTicketForm() {
           category: form.category,
           priority: form.priority,
           serviceMode: form.serviceMode,
+          deviceId: deviceId || undefined,
           device: {
             type: form.deviceType,
             brand: form.deviceBrand,
@@ -173,6 +205,7 @@ function NewTicketForm() {
       invalidate('tickets:');
       invalidate('portal:');
       invalidate('stats:');
+      if (deviceId) invalidate('devices:');
 
       // The ticket page celebrates and says how updates will arrive.
       router.push(`/portal/tickets/${ticket._id}?created=1`);
@@ -237,6 +270,27 @@ function NewTicketForm() {
           </li>
         ))}
       </ol>
+
+      {picked && (
+        <div className="page-enter flex items-center gap-3 rounded-2xl border border-brand/30 bg-brand-soft p-3">
+          <ArtTile kind={deviceMeta(picked.type).art} size={44} />
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-bold tracking-wider text-brand uppercase">Booking for</p>
+            <p className="truncate text-[14px] font-bold text-fg">{deviceTitle(picked)}</p>
+            {picked.serialNumber && (
+              <p className="truncate font-mono text-[11.5px] text-fg-muted">SN {picked.serialNumber}</p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => pickDevice(null)}
+            aria-label="Not this device"
+            className="grid size-8 place-items-center rounded-full text-fg-subtle transition-colors hover:bg-surface/60 hover:text-fg"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+      )}
 
       <Card className="overflow-hidden">
         <form onSubmit={submit}>
@@ -354,6 +408,47 @@ function NewTicketForm() {
                       ))}
                     </div>
                   </div>
+
+                  {devices && devices.length > 0 && (
+                    <div>
+                      <label className="text-[13px] font-semibold text-fg">Which device?</label>
+                      <div className="scrollbar-none -mx-1 mt-2.5 flex gap-2 overflow-x-auto px-1 pb-1">
+                        {devices.map((device) => (
+                          <button
+                            key={device._id}
+                            type="button"
+                            onClick={() => pickDevice(device)}
+                            className={cn(
+                              'flex w-40 shrink-0 items-center gap-2.5 rounded-xl border p-2.5 text-left transition-all active:scale-[0.97]',
+                              deviceId === device._id
+                                ? 'border-brand bg-brand-soft shadow-sm'
+                                : 'border-line bg-surface-2 hover:border-brand/40'
+                            )}
+                          >
+                            <ArtTile kind={deviceMeta(device.type).art} size={36} />
+                            <span className="min-w-0">
+                              <span className="block truncate text-[12.5px] font-bold text-fg">{deviceTitle(device)}</span>
+                              <span className="block truncate text-[11px] text-fg-muted">
+                                {device.serialNumber ? `SN ${device.serialNumber}` : deviceMeta(device.type).label}
+                              </span>
+                            </span>
+                          </button>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() => pickDevice(null)}
+                          className={cn(
+                            'shrink-0 rounded-xl border px-3.5 text-[12.5px] font-semibold transition-all',
+                            !deviceId
+                              ? 'border-brand bg-brand-soft text-brand'
+                              : 'border-line bg-surface-2 text-fg-muted hover:border-brand/40'
+                          )}
+                        >
+                          Another device
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <Input

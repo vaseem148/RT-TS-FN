@@ -4,12 +4,13 @@ import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './auth-provider';
 import { SystemBarsSync } from './system-bars-sync';
+import { CartProvider } from './cart-provider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
       <AuthProvider>
-        {children}
+        <CartProvider>{children}</CartProvider>
         <SystemBarsSync />
         <Toaster
           position="top-center"

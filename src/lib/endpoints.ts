@@ -1,7 +1,12 @@
 import { api } from './api';
 import type {
   AdminDashboard,
+  Device,
+  DeviceStats,
+  DeviceTicket,
   Enquiry,
+  Order,
+  OrderStatus,
   Pagination,
   Product,
   PublicStats,
@@ -227,4 +232,52 @@ export const statsApi = {
   public: () => api.get<{ stats: PublicStats }>('/stats/public').then((r) => r.data.stats),
   testimonials: () =>
     api.get<{ testimonials: Testimonial[] }>('/stats/testimonials').then((r) => r.data.testimonials),
+};
+
+/* ------------------------------ Devices ------------------------------ */
+
+export interface DeviceInput {
+  type: Device['type'];
+  name?: string;
+  brand?: string;
+  model?: string;
+  serialNumber?: string;
+  location?: string;
+  purchasedOn?: string;
+}
+
+export const deviceApi = {
+  list: (params: { search?: string } = {}) =>
+    api.get<{ devices: Device[] }>('/devices', { params }).then((r) => r.data.devices),
+  get: (id: string) =>
+    api
+      .get<{ device: Device; stats: DeviceStats; tickets: DeviceTicket[] }>(`/devices/${id}`)
+      .then((r) => r.data),
+  create: (payload: DeviceInput) =>
+    api.post<{ device: Device }>('/devices', payload).then((r) => r.data.device),
+  update: (id: string, payload: Partial<DeviceInput>) =>
+    api.patch<{ device: Device }>(`/devices/${id}`, payload).then((r) => r.data.device),
+  remove: (id: string) => api.delete(`/devices/${id}`).then((r) => r.data),
+};
+
+/* ------------------------------- Orders ------------------------------ */
+
+export interface OrderInput {
+  items: { productId: string; qty: number }[];
+  address?: { line1?: string; city?: string; pincode?: string; landmark?: string };
+  phone?: string;
+  installation?: boolean;
+  exchange?: { wanted: boolean; note?: string };
+  notes?: string;
+}
+
+export const orderApi = {
+  create: (payload: OrderInput) =>
+    api.post<{ order: Order }>('/orders', payload).then((r) => r.data.order),
+  list: (params: { status?: string; search?: string; page?: number; limit?: number } = {}) =>
+    api.get<{ orders: Order[]; pagination: Pagination }>('/orders', { params }).then((r) => r.data),
+  get: (id: string) => api.get<{ order: Order }>(`/orders/${id}`).then((r) => r.data.order),
+  setStatus: (id: string, status: OrderStatus, note?: string) =>
+    api.patch<{ order: Order }>(`/orders/${id}/status`, { status, note }).then((r) => r.data.order),
+  cancel: (id: string) => api.post<{ order: Order }>(`/orders/${id}/cancel`).then((r) => r.data.order),
 };

@@ -229,3 +229,72 @@ export interface Testimonial {
   assignedTo?: Pick<User, '_id' | 'name'> | null;
   createdAt: string;
 }
+
+/* ------------------------------ Devices ------------------------------ */
+
+export type DeviceType = 'laptop' | 'desktop' | 'printer' | 'cctv' | 'network' | 'server' | 'other';
+
+/** A customer's own device; tickets raised for it build its service history. */
+export interface Device {
+  _id: string;
+  customer: string;
+  type: DeviceType;
+  name: string;
+  brand: string;
+  model: string;
+  serialNumber: string;
+  location: string;
+  purchasedOn?: string;
+  source: 'customer' | 'order';
+  createdAt: string;
+  /** In lists only. */
+  ticketCount?: number;
+  openTickets?: number;
+}
+
+export interface DeviceStats {
+  totalVisits: number;
+  open: number;
+  thisWeek: number;
+  thisMonth: number;
+  repeatIssue: boolean;
+}
+
+export type DeviceTicket = Pick<
+  Ticket,
+  '_id' | 'ticketNumber' | 'subject' | 'category' | 'priority' | 'status' | 'createdAt'
+> & { assignedTo?: { _id: string; name: string } | null };
+
+/* ------------------------------- Orders ------------------------------ */
+
+export type OrderStatus = 'placed' | 'confirmed' | 'out_for_delivery' | 'delivered' | 'cancelled';
+
+export interface OrderItem {
+  product: string;
+  name: string;
+  category: string;
+  brand: string;
+  price: number;
+  qty: number;
+}
+
+export interface Order {
+  _id: string;
+  orderNumber: string;
+  customer: Pick<User, '_id' | 'name' | 'email' | 'phone'> | string;
+  items: OrderItem[];
+  subtotal: number;
+  deliveryFee: number;
+  total: number;
+  installation: boolean;
+  exchange: { wanted: boolean; note: string };
+  address: Address;
+  phone: string;
+  notes: string;
+  paymentMethod: 'pay_on_delivery';
+  status: OrderStatus;
+  history: { status: OrderStatus; note: string; at: string }[];
+  deliveredAt?: string;
+  cancelledAt?: string;
+  createdAt: string;
+}

@@ -5,10 +5,18 @@ import { X } from 'lucide-react';
 const SPARKS = [0, 45, 90, 135, 180, 225, 270, 315];
 
 /**
- * Shown on a ticket the moment it is raised: the check draws itself, a few
- * sparks fly out, and the customer learns how they will hear back.
+ * A success moment: the check draws itself and a few sparks fly out. Shown on a
+ * ticket the moment it is raised and on an order the moment it is placed.
  */
-export function TicketCreated({ ticketNumber, onClose }: { ticketNumber: string; onClose: () => void }) {
+export function SuccessCard({
+  title,
+  children,
+  onClose,
+}: {
+  title: string;
+  children: React.ReactNode;
+  onClose: () => void;
+}) {
   return (
     <div className="page-enter relative overflow-hidden rounded-2xl border border-success/30 bg-success-soft px-5 pt-6 pb-5 text-center">
       <button
@@ -56,11 +64,17 @@ export function TicketCreated({ ticketNumber, onClose }: { ticketNumber: string;
         </svg>
       </div>
 
-      <p className="mt-3 text-[17px] font-extrabold text-fg">Ticket raised!</p>
-      <p className="mx-auto mt-1 max-w-sm text-[13.5px] leading-relaxed text-fg-muted">
-        Your ticket number is <span className="font-mono font-bold text-fg">{ticketNumber}</span>. We
-        will keep you posted here, by email and on WhatsApp.
-      </p>
+      <p className="mt-3 text-[17px] font-extrabold text-fg">{title}</p>
+      <p className="mx-auto mt-1 max-w-sm text-[13.5px] leading-relaxed text-fg-muted">{children}</p>
     </div>
+  );
+}
+
+export function TicketCreated({ ticketNumber, onClose }: { ticketNumber: string; onClose: () => void }) {
+  return (
+    <SuccessCard title="Ticket raised!" onClose={onClose}>
+      Your ticket number is <span className="font-mono font-bold text-fg">{ticketNumber}</span>. We will
+      keep you posted here, by email and on WhatsApp.
+    </SuccessCard>
   );
 }

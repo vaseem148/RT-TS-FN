@@ -8,7 +8,7 @@ import { authApi } from '@/lib/endpoints';
 import { toApiError } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { useAuth } from '@/components/providers/auth-provider';
-import { APP_MORE_LINKS } from '@/components/layout/app-links';
+import { APP_CUSTOMER_LINKS, APP_MORE_LINKS } from '@/components/layout/app-links';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input, Select } from '@/components/ui/field';
@@ -262,6 +262,22 @@ export function ProfileView() {
       {/* App: this is the Account tab, so the links from the website's menus and
           signing out live here too. */}
       <div className="hidden space-y-4 app:block">
+        {user?.role === 'customer' && (
+          <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
+            {APP_CUSTOMER_LINKS.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className="flex items-center gap-3 px-4 py-3.5 text-[14.5px] font-semibold text-fg transition-colors active:bg-surface-2"
+                >
+                  <item.icon className="size-[18px] text-brand" />
+                  <span className="flex-1">{item.label}</span>
+                  <ChevronRight className="size-4 text-fg-subtle" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
         <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
           {APP_MORE_LINKS.map((item) => (
             <li key={item.href}>

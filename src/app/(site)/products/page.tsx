@@ -10,6 +10,9 @@ import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { EmptyState, Icon, Pagination, Reveal, Skeleton } from '@/components/ui/misc';
+import { ART_TINTS, ServiceArt, artForProduct } from '@/components/app/service-art';
+import { canBuy } from '@/components/providers/cart-provider';
+import { AddToCart, ViewCartBar } from '@/components/shop/shop-buttons';
 
 const CATEGORY_ICON: Record<string, string> = {
   desktop: 'Monitor',
@@ -157,10 +160,14 @@ export default function ProductsPage() {
               return (
                 <Reveal key={product._id} delay={(index % 4) * 0.05}>
                   <Card hover className="group flex h-full flex-col overflow-hidden">
-                    <div className="relative grid h-36 place-items-center bg-linear-135 from-brand/8 to-accent/8">
-                      <Icon
-                        name={CATEGORY_ICON[product.category]}
-                        className="size-12 text-brand/55 transition-transform duration-300 group-hover:scale-110"
+                    <div
+                      className="relative grid h-36 place-items-center"
+                      style={{ background: ART_TINTS[artForProduct(product)] }}
+                    >
+                      <ServiceArt
+                        kind={artForProduct(product)}
+                        size={96}
+                        className="transition-transform duration-300 group-hover:scale-110"
                       />
                       {discount > 0 && (
                         <span className="absolute top-3 left-3 rounded-md bg-danger px-2 py-0.5 text-[10.5px] font-bold text-white">
@@ -233,14 +240,18 @@ export default function ProductsPage() {
                           </span>
                         </div>
 
-                        <Button
-                          href={`/contact?product=${encodeURIComponent(product.name)}`}
-                          variant="secondary"
-                          size="sm"
-                          className="mt-3.5 w-full"
-                        >
-                          {isRental ? 'Enquire to rent' : 'Enquire now'}
-                        </Button>
+                        {canBuy(product) ? (
+                          <AddToCart product={product} className="mt-3.5 w-full" />
+                        ) : (
+                          <Button
+                            href={`/contact?product=${encodeURIComponent(product.name)}`}
+                            variant="secondary"
+                            size="sm"
+                            className="mt-3.5 w-full"
+                          >
+                            {isRental ? 'Enquire to rent' : 'Enquire now'}
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </Card>
@@ -251,6 +262,7 @@ export default function ProductsPage() {
         )}
 
         <Pagination page={page} pages={pages} onChange={setPage} className="mt-12" />
+        <ViewCartBar className="bottom-[calc(var(--safe-bottom)+6.5rem)] lg:bottom-6" />
 
         <div className="mt-16 flex flex-col items-center gap-4 rounded-2xl border border-line bg-surface p-8 text-center">
           <span className="grid size-12 place-items-center rounded-xl bg-brand-soft text-brand">
