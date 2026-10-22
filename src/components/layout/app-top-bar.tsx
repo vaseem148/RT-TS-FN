@@ -5,6 +5,7 @@ import { ChevronLeft } from 'lucide-react';
 import { useAuth } from '@/components/providers/auth-provider';
 import { useIsApp } from '@/lib/app-mode';
 import { tabsFor } from '@/lib/bottom-tabs';
+import { AppMenu } from './app-menu';
 import { ThemeToggle } from './theme-toggle';
 
 // A service page shows its name large in its own header, so the bar stays empty.
@@ -65,6 +66,7 @@ export function AppTopBar() {
         </p>
 
         <ThemeToggle className="rounded-full" />
+        <AppMenu className="ml-1" />
       </div>
     </header>
   );

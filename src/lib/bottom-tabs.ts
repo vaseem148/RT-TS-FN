@@ -19,12 +19,15 @@ export const BOTTOM_TABS = {
     { label: 'Services', href: '/services', icon: 'Wrench' },
     { label: 'Profile', href: '/portal/profile', icon: 'UserRound' },
   ],
-  /** In the app a customer's Home is the app home screen, not the portal overview. */
+  /**
+   * In the app a customer's Home is the app home screen, not the portal overview,
+   * and Track keeps its tab (services are on Home and in the menu).
+   */
   customerApp: [
     { label: 'Home', href: '/', icon: 'House', exact: true },
     { label: 'Tickets', href: '/portal/tickets', icon: 'Ticket' },
     { label: 'Raise a ticket', shortLabel: 'Raise', href: '/portal/tickets/new', icon: 'Plus', primary: true },
-    { label: 'Services', href: '/services', icon: 'Wrench' },
+    { label: 'Track', href: '/track', icon: 'Search' },
     { label: 'Account', href: '/portal/profile', icon: 'UserRound' },
   ],
   technician: [

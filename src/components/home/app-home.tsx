@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, ChevronRight, MapPin, MessageCircle, Phone, Search, X } from 'lucide-react';
+import { ArrowRight, ChevronRight, MapPin, MessageCircle, Phone, Search, Ticket, X } from 'lucide-react';
 import { site, whatsappLink } from '@/lib/site';
 import { serviceApi, ticketApi } from '@/lib/endpoints';
 import { useApi } from '@/lib/use-api';
@@ -11,12 +11,20 @@ import { useIsApp } from '@/lib/app-mode';
 import { formatCurrency } from '@/lib/utils';
 import { homeFor, useAuth } from '@/components/providers/auth-provider';
 import { APP_MORE_LINKS } from '@/components/layout/app-links';
+import { AppMenu } from '@/components/layout/app-menu';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { TicketCard } from '@/components/tickets/ticket-list';
 import { Button } from '@/components/ui/button';
 import { Icon, Skeleton, Spinner } from '@/components/ui/misc';
 
 const TICKET_NUMBER = /^RW-?\d/i;
+
+const ACTIONS = [
+  { label: 'Raise ticket', href: '/portal/tickets/new', icon: Ticket, tone: 'bg-brand-soft text-brand' },
+  { label: 'Track ticket', href: '/track', icon: Search, tone: 'bg-accent-soft text-accent' },
+  { label: 'Call us', href: `tel:${site.primaryPhone}`, icon: Phone, tone: 'bg-success-soft text-success' },
+  { label: 'WhatsApp', href: whatsappLink(), icon: MessageCircle, tone: 'bg-success-soft text-success' },
+];
 
 /**
  * Home screen of the Android app (the website keeps its marketing home page):
@@ -94,6 +102,7 @@ export function AppHome() {
               <Phone className="size-[17px]" />
             </a>
             <ThemeToggle className="rounded-full" />
+            <AppMenu />
           </div>
         </div>
 
@@ -142,6 +151,32 @@ export function AppHome() {
             <ArrowRight className="size-4" />
           </Link>
         )}
+
+        {/* Quick actions — the website's Raise / Track buttons and floating Call / WhatsApp */}
+        <section className="grid grid-cols-4 gap-2">
+          {ACTIONS.map((action) => {
+            const content = (
+              <>
+                <span className={`grid size-13 place-items-center rounded-2xl ${action.tone}`}>
+                  <action.icon className="size-6" />
+                </span>
+                <span className="text-center text-[11.5px] leading-tight font-semibold text-fg">
+                  {action.label}
+                </span>
+              </>
+            );
+            const className = 'flex flex-col items-center gap-1.5 transition-transform active:scale-90';
+            return action.href.startsWith('/') ? (
+              <Link key={action.label} href={action.href} className={className}>
+                {content}
+              </Link>
+            ) : (
+              <a key={action.label} href={action.href} className={className}>
+                {content}
+              </a>
+            );
+          })}
+        </section>
 
         {/* Categories */}
         <section>
@@ -262,34 +297,6 @@ export function AppHome() {
             </div>
           </section>
         )}
-
-        {/* Talk to us — the website's floating buttons live here in the app */}
-        <section className="grid grid-cols-2 gap-3">
-          <a
-            href={`tel:${site.primaryPhone}`}
-            className="flex items-center gap-3 rounded-2xl border border-line bg-surface p-3.5 transition-transform active:scale-[0.97]"
-          >
-            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-success-soft text-success">
-              <Phone className="size-[18px]" />
-            </span>
-            <span className="min-w-0">
-              <span className="block text-[13.5px] font-bold text-fg">Call us</span>
-              <span className="block truncate text-[11px] text-fg-subtle">24/7 emergency</span>
-            </span>
-          </a>
-          <a
-            href={whatsappLink()}
-            className="flex items-center gap-3 rounded-2xl border border-line bg-surface p-3.5 transition-transform active:scale-[0.97]"
-          >
-            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-success-soft text-success">
-              <MessageCircle className="size-[18px]" />
-            </span>
-            <span className="min-w-0">
-              <span className="block text-[13.5px] font-bold text-fg">WhatsApp</span>
-              <span className="block truncate text-[11px] text-fg-subtle">Chat with us</span>
-            </span>
-          </a>
-        </section>
 
         {!user && (
           <section className="rounded-3xl border border-line bg-surface p-5">
