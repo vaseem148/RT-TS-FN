@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { TOKEN_KEY, toApiError } from '@/lib/api';
 import { authApi } from '@/lib/endpoints';
+import { invalidate } from '@/lib/use-api';
+import { isAppMode } from '@/lib/app-mode';
 import type { User } from '@/lib/types';
 
 interface AuthContextValue {
@@ -98,10 +100,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.warn(toApiError(error).message);
     }
     localStorage.removeItem(TOKEN_KEY);
+    // Cached responses belong to this account; the next one to sign in on
+    // this device must not see them, even for a moment.
+    invalidate();
     setUser(null);
     setStats({});
     toast.success('Signed out');
-    router.push('/');
+    // In the app, AppGate takes signed-out users to the sign-in screen.
+    if (!isAppMode()) router.push('/');
   }, [router]);
 
   const value = useMemo(

@@ -173,6 +173,22 @@ html.app .app-hero .text-gradient {
   background-image: linear-gradient(100deg, #ffffff, #ffc6e3);
 }
 
+/* App, signed out: the page stays hidden (welcome-screen purple shows) until
+   AppGate has moved to the welcome or sign-in screen. Shown after 4s anyway,
+   so a slow start can never leave a blank screen. */
+html.rw-gate {
+  background-color: #1a1250;
+}
+html.rw-gate body {
+  visibility: hidden;
+  animation: rw-gate-reveal 0s linear 4s forwards;
+}
+@keyframes rw-gate-reveal {
+  to {
+    visibility: visible;
+  }
+}
+
 @theme inline {
   --color-bg: var(--bg);
   --color-bg-subtle: var(--bg-subtle);

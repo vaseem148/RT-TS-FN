@@ -9,6 +9,9 @@
  * - adds viewport-fit=cover, which lets Capacitor draw the page behind the
  *   status and navigation bars so the purple headers run to the top edge
  *   (the meta tag is already parsed — Next renders it before this script)
+ * - signed out (no token) on a screen that needs an account, adds `rw-gate`,
+ *   which keeps the page hidden until AppGate has moved to the welcome or
+ *   sign-in screen — so the home screen never flashes first
  *
  * For previewing in a browser: open any page with ?app=1 (and ?app=0 to undo).
  */
@@ -22,4 +25,5 @@ document.documentElement.classList.add('app');
 if(!s.getItem('theme'))s.setItem('theme','light');
 var m=document.querySelector('meta[name=viewport]');
 if(m&&m.content.indexOf('viewport-fit')<0)m.content+=', viewport-fit=cover';
+if(!s.getItem('renderways_token')&&!/^\\/(welcome|login|register|privacy|terms)\\/?$/.test(location.pathname))document.documentElement.classList.add('rw-gate');
 }catch(e){}})();`;

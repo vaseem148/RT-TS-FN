@@ -5,6 +5,8 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './auth-provider';
 import { SystemBarsSync } from './system-bars-sync';
 import { CartProvider } from './cart-provider';
+import { AppGate } from './app-gate';
+import { AppBackButton } from './app-back-button';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -12,6 +14,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <AuthProvider>
         <CartProvider>{children}</CartProvider>
         <SystemBarsSync />
+        <AppGate />
+        <AppBackButton />
         <Toaster
           position="top-center"
           // Clear of the status bar when the app draws edge to edge.

@@ -12,10 +12,13 @@ import { BottomNav } from './bottom-nav';
  * and gives way to the booking bar on a service page.
  */
 export function SiteBottomNav() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const isApp = useIsApp();
   const pathname = usePathname();
   const isServicePage = /^\/services\/[^/]+$/.test(pathname);
+
+  // Signed out, the app only shows its welcome and legal pages (see AppGate) — no tabs.
+  if (isApp && !loading && !user) return null;
 
   return (
     <BottomNav

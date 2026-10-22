@@ -40,7 +40,7 @@ export function useGoBack() {
  */
 export function AppTopBar() {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const isApp = useIsApp();
   const goBack = useGoBack();
 
@@ -69,7 +69,8 @@ export function AppTopBar() {
 
         {(pathname.startsWith('/products') || pathname === '/cart') && <CartButton className="rounded-full" />}
         <ThemeToggle className="rounded-full" />
-        <AppMenu className="ml-1" />
+        {/* Signed out, the app only shows its legal pages here — nothing to menu. */}
+        {(user || loading) && <AppMenu className="ml-1" />}
       </div>
     </header>
   );

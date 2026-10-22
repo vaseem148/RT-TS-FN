@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import type { Role } from '@/lib/types';
 import { homeFor, useAuth } from '@/components/providers/auth-provider';
@@ -20,10 +20,15 @@ export function RequireRole({
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  // Signing out empties `user` while still on this page; the sign-out moves on
+  // by itself, and a second redirect here would race it.
+  const hadUser = useRef(false);
 
   useEffect(() => {
     if (loading) return;
+    if (user) hadUser.current = true;
     if (!user) {
+      if (hadUser.current) return;
       // Keep the query too, so a "Book a slot" pick survives signing in.
       router.replace(`/login?next=${encodeURIComponent(pathname + window.location.search)}`);
       return;

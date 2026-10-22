@@ -55,7 +55,9 @@ export default function RegisterPage() {
         company: form.company,
       });
       toast.success(`Welcome to Renderways, ${user.name.split(' ')[0]}!`);
-      router.push(isApp ? '/' : '/portal');
+      // In the app, Back from home must not return to the sign-up screen.
+      if (isApp) router.replace('/');
+      else router.push('/portal');
     } catch (error) {
       const apiError = toApiError(error);
       setErrors(apiError.details || {});

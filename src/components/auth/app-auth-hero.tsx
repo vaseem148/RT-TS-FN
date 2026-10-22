@@ -47,8 +47,9 @@ export function AppAuthHero() {
       <div className="flex items-center justify-between gap-3 px-4">
         <div className="flex items-center gap-1">
           <Link
-            href="/"
-            aria-label="Back to home"
+            href="/welcome"
+            replace
+            aria-label="Back to welcome"
             className="grid size-10 place-items-center rounded-full text-white transition-transform active:scale-90 active:bg-white/10"
           >
             <ChevronLeft className="size-6" />

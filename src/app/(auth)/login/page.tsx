@@ -58,7 +58,10 @@ function LoginForm() {
       const next = searchParams.get('next');
       // In the app a customer's home is the app home screen.
       const home = isApp && user.role === 'customer' ? '/' : homeFor(user.role);
-      router.push(next && /^\/(?![/\\])/.test(next) ? next : home);
+      const target = next && /^\/(?![/\\])/.test(next) ? next : home;
+      // In the app, Back from there must not return to the sign-in screen.
+      if (isApp) router.replace(target);
+      else router.push(target);
     } catch (error) {
       const apiError = toApiError(error);
       setErrors(apiError.details || {});
